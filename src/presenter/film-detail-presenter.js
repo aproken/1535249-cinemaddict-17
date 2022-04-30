@@ -13,8 +13,8 @@ export default class FilmsDetailPresenter {
     this.filmDetailContainer = filmDetailContainer;
 
     render(this.filmDetailComponent, this.filmDetailContainer, RenderPosition.AFTEREND);
-    render(this.formFilmDetailComponent, this.filmDetailComponent);
-    render(new FilmDescriptionView(), this.formFilmDetailComponent);
-    render(new CommentsView(), this.formFilmDetailComponent);
+    render(this.formFilmDetailComponent, this.filmDetailComponent.getElement());
+    render(new FilmDescriptionView(), this.formFilmDetailComponent.getElement());
+    render(new CommentsView(), this.formFilmDetailComponent.getElement());
   };
 }
