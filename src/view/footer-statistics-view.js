@@ -1,14 +1,16 @@
 import { createElement } from '../render.js';
+import { FILM_COUNT } from '../const.js';
 
 const createFooterStatisticsTemplate = () => (
   `<section class="footer__statistics">
-    <p>130 291 movies inside</p>
+    <p>${FILM_COUNT} movies inside</p>
   </section>`
 );
 
 export default class FooterStatisticsView {
+
   getTemplate() {
-    return createFooterStatisticsTemplate();
+    return createFooterStatisticsTemplate(this.film);
   }
 
   getElement() {

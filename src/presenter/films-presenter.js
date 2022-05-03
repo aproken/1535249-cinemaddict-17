@@ -1,3 +1,5 @@
+import SortView from '../view/sort-view.js';
+import FilterView from '../view/filter-view.js';
 import FilmsView from '../view/films-view.js';
 import FilmsListView from '../view/films-list-view.js';
 import FilmsListContainerView from '../view/films-list-container-view.js';
@@ -18,6 +20,8 @@ export default class FilmsPresenter {
 
     console.log(this.films);
 
+    render(new FilterView(this.films), this.filmsContainer);
+    render(new SortView(this.films), this.filmsContainer);
     render(this.filmsComponent, this.filmsContainer);
     render(this.filmsListComponent, this.filmsComponent.getElement());
     render(this.filmsListContainerComponent, this.filmsListComponent.getElement());
