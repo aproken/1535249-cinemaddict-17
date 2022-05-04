@@ -123,8 +123,10 @@ export const COMMENTS_COUNT = [0, 5];
 
 export const YEAR_RELEASE = [1929, 1990];
 
+export const YEAR_COMMENT = [2021, 2022];
+
 export const RUNTIME = [90, 120];
 
-export const FILM_COUNT = 17;
+export const FILM_COUNT = 5;
 
 export const FILM_COUNT_ON_SCREEN = 5;

@@ -18,8 +18,6 @@ export default class FilmsPresenter {
     this.filmsModel = filmsModel;
     this.films = [...this.filmsModel.films];
 
-    console.log(this.films);
-
     render(new FilterView(this.films), this.filmsContainer);
     render(new SortView(this.films), this.filmsContainer);
     render(this.filmsComponent, this.filmsContainer);

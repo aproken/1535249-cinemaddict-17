@@ -1,13 +1,13 @@
-import { SAMPLE_DESCRIPTION, AUTHORS, EMOTIONS, COMMENTS_COUNT } from '../const.js';
-import { getRandomInteger, getRandomItem } from '../utils.js';
+import { SAMPLE_DESCRIPTION, AUTHORS, EMOTIONS, COMMENTS_COUNT, YEAR_COMMENT } from '../const.js';
+import { getRandomInteger, getRandomItem, getDate } from '../utils.js';
 
 // Функция для генерации одного комментария от случайного пользователя
 const generateCommentItem = () => ({
-  'id': getRandomInteger(1, AUTHORS.length),
-  'author': getRandomItem(AUTHORS),
-  'comment': getRandomItem(SAMPLE_DESCRIPTION),
-  'date': '2019-05-11T16:12:32.554Z',
-  'emotion': getRandomItem(EMOTIONS),
+  id: getRandomInteger(1, AUTHORS.length),
+  author: getRandomItem(AUTHORS),
+  commentText: getRandomItem(SAMPLE_DESCRIPTION),
+  date: getDate(...YEAR_COMMENT),
+  emotion: getRandomItem(EMOTIONS),
 });
 
 export const generateComments = () => {
