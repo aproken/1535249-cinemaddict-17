@@ -1,8 +1,8 @@
 const RenderPosition = {
-  BEFOREBEGIN: 'beforebegin',
-  AFTERBEGIN: 'afterbegin',
-  BEFOREEND: 'beforeend',
-  AFTEREND: 'afterend',
+  BEFORE_BEGIN: 'beforebegin',
+  AFTER_BEGIN: 'afterbegin',
+  BEFORE_END: 'beforeend',
+  AFTER_END: 'afterend',
 };
 
 const createElement = (template) => {
@@ -12,20 +12,20 @@ const createElement = (template) => {
   return newElement.firstElementChild;
 };
 
-const render = (component, container, place = RenderPosition.BEFOREEND) => {
+const render = (component, container, place = RenderPosition.BEFORE_END) => {
   const element = component.getElement();
 
   switch (place) {
-    case RenderPosition.BEFOREBEGIN:
+    case RenderPosition.BEFORE_BEGIN:
       container.before(element);
       break;
-    case RenderPosition.AFTERBEGIN:
+    case RenderPosition.AFTER_BEGIN:
       container.prepend(element);
       break;
-    case RenderPosition.BEFOREEND:
+    case RenderPosition.BEFORE_END:
       container.append(element);
       break;
-    case RenderPosition.AFTEREND:
+    case RenderPosition.AFTER_END:
       container.after(element);
       break;
   }
