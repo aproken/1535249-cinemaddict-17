@@ -1,6 +1,6 @@
-import { createElement } from '../render.js';
+import { createElement } from '../../render.js';
 import dayjs from 'dayjs';
-import { MAX_LENGTH_DESCRIPTION } from '../const.js';
+import { MAX_LENGTH_DESCRIPTION } from '../../const.js';
 
 const createFilmCardTemplate = (film) => {
   const {

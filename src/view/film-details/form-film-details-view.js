@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import { createElement } from '../../render.js';
 
 const createFormFilmDetailsTemplate = () => '<form class="film-details__inner" action="" method="get"></form>';
 

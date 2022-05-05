@@ -1,9 +1,9 @@
-import FilmDetailsView from '../view/film-details-view.js';
-import FormFilmDetailsView from '../view/form-film-details-view.js';
-import FilmDescriptionView from '../view/film-description-view.js';
-import CommentsView from '../view/comments-view.js';
-import CommentsItemView from '../view/comments-item-view.js';
-import AddNewCommentView from '../view/add-new-comment-view.js';
+import FilmDetailsView from '../view/film-details/film-details-view.js';
+import FormFilmDetailsView from '../view/film-details/form-film-details-view.js';
+import FilmDescriptionView from '../view/film-details/film-description-view.js';
+import CommentsView from '../view/comments/comments-view.js';
+import CommentsItemView from '../view/comments/comments-item-view.js';
+import AddNewCommentView from '../view/comments/add-new-comment-view.js';
 
 import { render, RenderPosition } from '../render.js';
 
@@ -13,15 +13,17 @@ export default class FilmsDetailPresenter {
   commentsContainerComponent = null;
   commentsListComponent = null;
 
-  init = (filmDetailContainer, filmsModel) => {
+  constructor(filmDetailContainer, filmsModel) {
     this.filmDetailContainer = filmDetailContainer;
     this.filmsModel = filmsModel;
     this.film = this.filmsModel.films[0];
     this.commentsContainerComponent = new CommentsView(this.film);
     this.commentsListComponent = this.commentsContainerComponent.getElement().querySelector('.film-details__comments-wrap');
     this.comments = this.film.comments;
+  }
 
-    render(this.filmDetailComponent, this.filmDetailContainer, RenderPosition.AFTEREND);
+  init = () => {
+    render(this.filmDetailComponent, this.filmDetailContainer, RenderPosition.AFTER_END);
     render(this.formFilmDetailComponent, this.filmDetailComponent.getElement());
     render(new FilmDescriptionView(this.film), this.formFilmDetailComponent.getElement());
     render(this.commentsContainerComponent, this.formFilmDetailComponent.getElement());

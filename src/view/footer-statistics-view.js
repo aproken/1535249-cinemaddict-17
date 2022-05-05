@@ -1,9 +1,9 @@
 import { createElement } from '../render.js';
-import { FILM_COUNT } from '../const.js';
+import { FILMS_COUNT } from '../const.js';
 
 const createFooterStatisticsTemplate = () => (
   `<section class="footer__statistics">
-    <p>${FILM_COUNT} movies inside</p>
+    <p>${FILMS_COUNT} movies inside</p>
   </section>`
 );
 

@@ -9,8 +9,12 @@ const createSortTemplate = () => (
 );
 
 export default class SortView {
+  constructor(films) {
+    this.films = films;
+  }
+
   getTemplate() {
-    return createSortTemplate();
+    return createSortTemplate(this.films);
   }
 
   getElement() {
