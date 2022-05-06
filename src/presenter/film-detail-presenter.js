@@ -8,30 +8,38 @@ import AddNewCommentView from '../view/comments/add-new-comment-view.js';
 import { render, RenderPosition } from '../render.js';
 
 export default class FilmsDetailPresenter {
-  filmDetailComponent = new FilmDetailsView();
-  formFilmDetailComponent = new FormFilmDetailsView();
-  commentsContainerComponent = null;
-  commentsListComponent = null;
+  #filmDetailContainer = null;
+  #filmsModel = null;
+
+  #filmDetailComponent = new FilmDetailsView();
+  #formFilmDetailComponent = new FormFilmDetailsView();
+  #commentsContainerComponent = null;
+  #commentsListComponent = null;
+
+  #film = null;
+  #comments = null;
 
   constructor(filmDetailContainer, filmsModel) {
-    this.filmDetailContainer = filmDetailContainer;
-    this.filmsModel = filmsModel;
-    this.film = this.filmsModel.films[0];
-    this.commentsContainerComponent = new CommentsView(this.film);
-    this.commentsListComponent = this.commentsContainerComponent.getElement().querySelector('.film-details__comments-wrap');
-    this.comments = this.film.comments;
+    this.#filmDetailContainer = filmDetailContainer;
+    this.#filmsModel = filmsModel;
+
+    this.#film = this.#filmsModel.films[0];
+    this.#comments = this.#film.comments;
+
+    this.#commentsContainerComponent = new CommentsView(this.#film);
+    this.#commentsListComponent = this.#commentsContainerComponent.element.querySelector('.film-details__comments-wrap');
   }
 
   init = () => {
-    render(this.filmDetailComponent, this.filmDetailContainer, RenderPosition.AFTER_END);
-    render(this.formFilmDetailComponent, this.filmDetailComponent.getElement());
-    render(new FilmDescriptionView(this.film), this.formFilmDetailComponent.getElement());
-    render(this.commentsContainerComponent, this.formFilmDetailComponent.getElement());
+    render(this.#filmDetailComponent, this.#filmDetailContainer, RenderPosition.AFTER_END);
+    render(this.#formFilmDetailComponent, this.#filmDetailComponent.element);
+    render(new FilmDescriptionView(this.#film), this.#formFilmDetailComponent.element);
+    render(this.#commentsContainerComponent, this.#formFilmDetailComponent.element);
 
-    for(let i = 0; i < this.comments.length; i++) {
-      render(new CommentsItemView(this.comments[i]), this.commentsListComponent);
+    for(let i = 0; i < this.#comments.length; i++) {
+      render(new CommentsItemView(this.#comments[i]), this.#commentsListComponent);
     }
 
-    render(new AddNewCommentView(), this.commentsListComponent);
+    render(new AddNewCommentView(), this.#commentsListComponent);
   };
 }

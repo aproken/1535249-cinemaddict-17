@@ -21,22 +21,25 @@ const createCommentsItemTemplate = (comments) => {
 };
 
 export default class CommentsItemView {
+  #element = null;
+  #comments = null;
+
   constructor(comments) {
-    this.comments = comments;
+    this.#comments = comments;
   }
 
-  getTemplate() {
-    return createCommentsItemTemplate(this.comments);
+  get template() {
+    return createCommentsItemTemplate(this.#comments);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
