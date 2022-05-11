@@ -1,6 +1,7 @@
 import SortView from '../view/sort-view.js';
 import FilterView from '../view/filter-view.js';
 import FilmsView from '../view/films-card/films-view.js';
+import FilmsListView from '../view/films-card/films-list-view.js';
 import FilmsListContainerView from '../view/films-card/films-list-container-view.js';
 import FilmsListShowMoreView from '../view/films-card/films-list-show-more-view.js';
 import FilmCardView from '../view/films-card/film-card-view.js';
@@ -16,7 +17,7 @@ export default class FilmsPresenter {
   #filmsModel = null;
 
   #filmsComponent = new FilmsView();
-  #filmsListComponent = null;
+  #filmsListComponent = new FilmsListView();
   #filmsListContainerComponent = new FilmsListContainerView();
   #filmsListShowMoreComponent = new FilmsListShowMoreView();
 
@@ -30,8 +31,6 @@ export default class FilmsPresenter {
     this.#filmsModel = filmsModel;
 
     this.#films = [...this.#filmsModel.films];
-
-    this.#filmsListComponent = this.#filmsComponent.element.querySelector('.films-list');
 
     this.#filmDetailsPresenter = new FilmDetailsPresenter(this.#filmDetailsContainer);
   }
@@ -58,13 +57,13 @@ export default class FilmsPresenter {
 
     render(this.#filmsComponent, this.#filmsContainer);
     render(this.#filmsListComponent, this.#filmsComponent.element);
-    render(this.#filmsListContainerComponent, this.#filmsListComponent);
+    render(this.#filmsListContainerComponent, this.#filmsListComponent.element);
 
     for(let i = 0; i < this.#films.length; i++) {
       this.#renderFilm(this.#films[i]);
     }
 
-    render(this.#filmsListShowMoreComponent, this.#filmsListComponent);
+    render(this.#filmsListShowMoreComponent, this.#filmsListComponent.element);
   };
 }
 
