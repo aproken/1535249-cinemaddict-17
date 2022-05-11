@@ -6,30 +6,64 @@ import FilmsListContainerView from '../view/films-card/films-list-container-view
 import FilmsListShowMoreView from '../view/films-card/films-list-show-more-view.js';
 import FilmCardView from '../view/films-card/film-card-view.js';
 
+import FilmDetailsPresenter from './film-details-presenter.js';
+
 import { render } from '../render.js';
+//import { FILM_COUNT_ON_SCREEN } from '../const.js';
 
 export default class FilmsPresenter {
-  filmsComponent = new FilmsView();
-  filmsListComponent = new FilmsListView();
-  filmsListContainerComponent = new FilmsListContainerView();
+  #filmsContainer = null;
+  #filmDetailsContainer = null;
+  #filmsModel = null;
+
+  #filmsComponent = new FilmsView();
+  #filmsListComponent = new FilmsListView();
+  #filmsListContainerComponent = new FilmsListContainerView();
+  #filmsListShowMoreComponent = new FilmsListShowMoreView();
+
+  #filmDetailsPresenter = null;
+
+  #films = [];
 
   constructor(filmsContainer, filmsModel) {
-    this.filmsContainer = filmsContainer;
-    this.filmsModel = filmsModel;
-    this.films = [...this.filmsModel.films];
+    this.#filmsContainer = filmsContainer;
+    this.#filmDetailsContainer = document.querySelector('.footer');
+    this.#filmsModel = filmsModel;
+
+    this.#films = [...this.#filmsModel.films];
+
+    this.#filmDetailsPresenter = new FilmDetailsPresenter(this.#filmDetailsContainer);
   }
 
   init = () => {
-    render(new FilterView(this.films), this.filmsContainer);
-    render(new SortView(this.films), this.filmsContainer);
-    render(this.filmsComponent, this.filmsContainer);
-    render(this.filmsListComponent, this.filmsComponent.getElement());
-    render(this.filmsListContainerComponent, this.filmsListComponent.getElement());
+    this.#renderFilms();
+  };
 
-    for(let i = 0; i < this.films.length; i++) {
-      render(new FilmCardView(this.films[i]), this.filmsListContainerComponent.getElement());
+  #renderFilm = (film) => {
+    const filmCardComponent = new FilmCardView(film);
+
+    const showFilmDetails = () => {
+      this.#filmDetailsPresenter.show(film);
+    };
+
+    filmCardComponent.element.addEventListener('click', showFilmDetails);
+
+    render(filmCardComponent, this.#filmsListContainerComponent.element);
+  };
+
+  #renderFilms = () => {
+    render(new FilterView(this.#films), this.#filmsContainer);
+    render(new SortView(this.#films), this.#filmsContainer);
+
+    render(this.#filmsComponent, this.#filmsContainer);
+    render(this.#filmsListComponent, this.#filmsComponent.element);
+    render(this.#filmsListContainerComponent, this.#filmsListComponent.element);
+
+    for(let i = 0; i < this.#films.length; i++) {
+      this.#renderFilm(this.#films[i]);
     }
 
-    render(new FilmsListShowMoreView(), this.filmsListComponent.getElement());
+    render(this.#filmsListShowMoreComponent, this.#filmsListComponent.element);
   };
 }
+

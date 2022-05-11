@@ -2,23 +2,26 @@ import { createElement } from '../../render.js';
 
 const createFilmsListTemplate = () => (
   `<section class="films-list">
-      <h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>
+    <h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>
    </section>`
 );
 
 export default class FilmsListView {
-  getTemplate() {
+  #element = null;
+
+  get template() {
     return createFilmsListTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
+    return this.#element;
   }
 
-  getRemove() {
-    this.element = null;
+  removeElement() {
+    this.#element = null;
   }
 }
+
