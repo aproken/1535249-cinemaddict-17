@@ -19,7 +19,7 @@ export default class FilmsPresenter {
 
   #filmsComponent = new FilmsView();
   #filmsListComponent = new FilmsListView();
-  #filmslistEmptyComponent = null;
+  #filmsListEmptyComponent = null;
   #filmsListContainerComponent = new FilmsListContainerView();
   #filmsListShowMoreComponent = new FilmsListShowMoreView();
 
@@ -71,8 +71,8 @@ export default class FilmsPresenter {
   };
 
   #renderFilmsListEmpty = () => {
-    this.#filmslistEmptyComponent = new FilmsListEmptyView(this.#filter);
-    render(this.#filmslistEmptyComponent, this.#filmsComponent.element);
+    this.#filmsListEmptyComponent = new FilmsListEmptyView(this.#filter);
+    render(this.#filmsListEmptyComponent, this.#filmsComponent.element);
   };
 
   #renderFilms = () => {
