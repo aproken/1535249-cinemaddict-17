@@ -12,6 +12,7 @@ export default class FilmDetailsPresenter {
 
   #filmDetailsComponent = new FilmDetailsView();
   #formFilmDetailsComponent = new FormFilmDetailsView();
+  #filmDescriptionComponent = null;
   #commentsContainerComponent = null;
   #commentsListComponent = null;
 
@@ -34,12 +35,13 @@ export default class FilmDetailsPresenter {
     this.#film = film;
     this.#comments = this.#film.comments;
 
+    this.#filmDescriptionComponent = new FilmDescriptionView(this.#film);
     this.#commentsContainerComponent = new CommentsView(this.#film);
     this.#commentsListComponent = this.#commentsContainerComponent.element.querySelector('.film-details__comments-wrap');
 
     render(this.#filmDetailsComponent, this.#filmDetailsContainer, RenderPosition.AFTER_END);
     render(this.#formFilmDetailsComponent, this.#filmDetailsComponent.element);
-    render(new FilmDescriptionView(this.#film), this.#formFilmDetailsComponent.element);
+    render(this.#filmDescriptionComponent, this.#formFilmDetailsComponent.element);
     render(this.#commentsContainerComponent, this.#formFilmDetailsComponent.element);
 
     for(let i = 0; i < this.#comments.length; i++) {
@@ -50,9 +52,7 @@ export default class FilmDetailsPresenter {
 
     document.body.classList.add('hide-overflow');
 
-    this.#buttonClose = this.#filmDetailsComponent.element.querySelector('.film-details__close-btn');
-
-    this.#buttonClose.addEventListener('click', this.hide);
+    this.#filmDescriptionComponent.setClickHandler(this.hide);
     document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
@@ -63,7 +63,7 @@ export default class FilmDetailsPresenter {
     this.#formFilmDetailsComponent.removeElement();
     this.#film = null;
     document.body.classList.remove('hide-overflow');
-    this.#buttonClose.removeEventListener('click', this.hide);
+    this.#filmDescriptionComponent.unsetClickHandler('click', this.hide);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 }

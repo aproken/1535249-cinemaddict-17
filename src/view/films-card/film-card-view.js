@@ -1,4 +1,4 @@
-import { createElement } from '../../render.js';
+import AbstractView from '../../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
 import { MAX_LENGTH_DESCRIPTION } from '../../const.js';
 
@@ -36,11 +36,11 @@ const createFilmCardTemplate = (film) => {
 };
 
 
-export default class FilmCardSView {
-  #element = null;
+export default class FilmCardSView extends AbstractView {
   #film = null;
 
   constructor(film) {
+    super();
     this.#film = film;
   }
 
@@ -48,14 +48,18 @@ export default class FilmCardSView {
     return createFilmCardTemplate(this.#film);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.addEventListener('click', this.#clickHandler);
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  unsetClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.removeEventListener('click', this.#clickHandler);
+  };
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }
