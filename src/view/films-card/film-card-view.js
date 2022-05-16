@@ -1,5 +1,6 @@
-import AbstractView from '../../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
+
+import AbstractView from '../../framework/view/abstract-view.js';
 import { MAX_LENGTH_DESCRIPTION } from '../../const.js';
 
 const createFilmCardTemplate = (film) => {

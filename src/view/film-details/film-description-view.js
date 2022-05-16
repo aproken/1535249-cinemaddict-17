@@ -1,5 +1,6 @@
-import AbstractView from '../../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
+
+import AbstractView from '../../framework/view/abstract-view.js';
 
 const createFilmDescriptionTemplate = (film) => {
   const {
@@ -109,8 +110,7 @@ export default class FilmDescriptionView extends AbstractView {
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
   };
 
-  unsetClickHandler = (callback) => {
-    this._callback.click = callback;
+  unsetClickHandler = () => {
     this.element.querySelector('.film-details__close-btn').removeEventListener('click', this.#clickHandler);
   };
 

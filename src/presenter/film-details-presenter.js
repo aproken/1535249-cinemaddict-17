@@ -18,7 +18,6 @@ export default class FilmDetailsPresenter {
 
   #film = null;
   #comments = null;
-  #buttonClose = null;
 
   constructor(filmDetailsContainer) {
     this.#filmDetailsContainer = filmDetailsContainer;
@@ -63,7 +62,7 @@ export default class FilmDetailsPresenter {
     this.#formFilmDetailsComponent.removeElement();
     this.#film = null;
     document.body.classList.remove('hide-overflow');
-    this.#filmDescriptionComponent.unsetClickHandler('click', this.hide);
+    this.#filmDescriptionComponent.unsetClickHandler(this.hide);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 }

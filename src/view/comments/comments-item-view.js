@@ -1,5 +1,6 @@
-import AbstractView from '../../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
+
+import AbstractView from '../../framework/view/abstract-view.js';
 
 const createCommentsItemTemplate = (comments) => {
   const {author, commentText, date, emotion} = comments;
