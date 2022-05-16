@@ -1,4 +1,4 @@
-import { render } from '../framework/render.js';
+import { render, remove } from '../framework/render.js';
 
 import SortView from '../view/sort-view.js';
 import FilterView from '../view/filter-view.js';
@@ -53,8 +53,7 @@ export default class FilmsPresenter {
     this.#renderedFilmCount += FILM_COUNT_ON_SCREEN;
 
     if (this.#renderedFilmCount >= this.#films.length) {
-      this.#filmsListShowMoreComponent.element.remove();
-      this.#filmsListShowMoreComponent.removeElement();
+      remove(this.#filmsListShowMoreComponent);
     }
   };
 

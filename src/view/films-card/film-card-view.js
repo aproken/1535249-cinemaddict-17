@@ -54,8 +54,7 @@ export default class FilmCardSView extends AbstractView {
     this.element.addEventListener('click', this.#clickHandler);
   };
 
-  unsetClickHandler = (callback) => {
-    this._callback.click = callback;
+  unsetClickHandler = () => {
     this.element.removeEventListener('click', this.#clickHandler);
   };
 
