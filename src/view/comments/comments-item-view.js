@@ -1,5 +1,6 @@
-import { createElement } from '../../render.js';
 import dayjs from 'dayjs';
+
+import AbstractView from '../../framework/view/abstract-view.js';
 
 const createCommentsItemTemplate = (comments) => {
   const {author, commentText, date, emotion} = comments;
@@ -20,26 +21,15 @@ const createCommentsItemTemplate = (comments) => {
   );
 };
 
-export default class CommentsItemView {
-  #element = null;
+export default class CommentsItemView extends AbstractView {
   #comments = null;
 
   constructor(comments) {
+    super();
     this.#comments = comments;
   }
 
   get template() {
     return createCommentsItemTemplate(this.#comments);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

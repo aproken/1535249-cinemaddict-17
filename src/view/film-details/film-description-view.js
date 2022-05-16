@@ -1,5 +1,6 @@
-import { createElement } from '../../render.js';
 import dayjs from 'dayjs';
+
+import AbstractView from '../../framework/view/abstract-view.js';
 
 const createFilmDescriptionTemplate = (film) => {
   const {
@@ -92,11 +93,11 @@ const createFilmDescriptionTemplate = (film) => {
   `);
 };
 
-export default class FilmDescriptionView {
-  #element = null;
+export default class FilmDescriptionView extends AbstractView {
   #film = null;
 
   constructor(film) {
+    super();
     this.#film = film;
   }
 
@@ -104,14 +105,17 @@ export default class FilmDescriptionView {
     return createFilmDescriptionTemplate(this.#film);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  unsetClickHandler = () => {
+    this.element.querySelector('.film-details__close-btn').removeEventListener('click', this.#clickHandler);
+  };
+
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }

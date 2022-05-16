@@ -1,3 +1,5 @@
+import { render, remove } from '../framework/render.js';
+
 import SortView from '../view/sort-view.js';
 import FilterView from '../view/filter-view.js';
 import FilmsView from '../view/films-card/films-view.js';
@@ -9,7 +11,6 @@ import FilmCardView from '../view/films-card/film-card-view.js';
 
 import FilmDetailsPresenter from './film-details-presenter.js';
 
-import { render } from '../render.js';
 import { FILM_COUNT_ON_SCREEN, FilterType } from '../const.js';
 
 export default class FilmsPresenter {
@@ -44,8 +45,7 @@ export default class FilmsPresenter {
     this.#renderFilms();
   };
 
-  #handleFilmsListShowMoreClick = (evt) => {
-    evt.preventDefault();
+  #handleFilmsListShowMoreClick = () => {
     this.#films
       .slice(this.#renderedFilmCount, this.#renderedFilmCount + FILM_COUNT_ON_SCREEN)
       .forEach((film) => this.#renderFilm(film));
@@ -53,8 +53,7 @@ export default class FilmsPresenter {
     this.#renderedFilmCount += FILM_COUNT_ON_SCREEN;
 
     if (this.#renderedFilmCount >= this.#films.length) {
-      this.#filmsListShowMoreComponent.element.remove();
-      this.#filmsListShowMoreComponent.removeElement();
+      remove(this.#filmsListShowMoreComponent);
     }
   };
 
@@ -65,7 +64,7 @@ export default class FilmsPresenter {
       this.#filmDetailsPresenter.show(film);
     };
 
-    filmCardComponent.element.addEventListener('click', showFilmDetails);
+    filmCardComponent.setClickHandler(showFilmDetails);
 
     render(filmCardComponent, this.#filmsListContainerComponent.element);
   };
@@ -92,7 +91,7 @@ export default class FilmsPresenter {
     for(let i = 0; i < Math.min(this.#films.length, FILM_COUNT_ON_SCREEN); i++) {
       this.#renderFilm(this.#films[i]);
 
-      this.#filmsListShowMoreComponent.element.addEventListener('click', this.#handleFilmsListShowMoreClick);
+      this.#filmsListShowMoreComponent.setClickHandler(this.#handleFilmsListShowMoreClick);
     }
 
     render(this.#filmsListShowMoreComponent, this.#filmsListComponent.element);

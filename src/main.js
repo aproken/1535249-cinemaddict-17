@@ -1,7 +1,7 @@
+import { render } from './framework/render.js';
+
 import ProfileRatingView from './view/profile-rating-view.js';
 import FooterStatisticsView from './view/footer-statistics-view.js';
-
-import { render } from './render.js';
 
 import FilmsPresenter from './presenter/films-presenter.js';
 import FilmsModel from './model/films-model.js';
