@@ -95,6 +95,7 @@ const createFilmDescriptionTemplate = (film) => {
 
 export default class FilmDescriptionView extends AbstractView {
   #film = null;
+  #closeButton = null;
 
   constructor(film) {
     super();
@@ -107,11 +108,12 @@ export default class FilmDescriptionView extends AbstractView {
 
   setClickHandler = (callback) => {
     this._callback.click = callback;
-    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
+    this.#closeButton = this.element.querySelector('.film-details__close-btn');
+    this.#closeButton.addEventListener('click', this.#clickHandler);
   };
 
   unsetClickHandler = () => {
-    this.element.querySelector('.film-details__close-btn').removeEventListener('click', this.#clickHandler);
+    this.#closeButton.removeEventListener('click', this.#clickHandler);
   };
 
   #clickHandler = (evt) => {

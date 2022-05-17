@@ -1,6 +1,6 @@
 import { TITLES, POSTERS, DIRECTORS, WRITERS, ACTORS, RELEASE_COUNTRIES, GENRES, SAMPLE_DESCRIPTION, WRITERS_COUNT, ACTORS_COUNT, GENRES_COUNT, DESCRIPTIONS_COUNT, YEAR_RELEASE, RUNTIME } from '../const.js';
 
-import { getRandomInteger, getRandomItem, getRandomArray, getDate } from '../utils.js';
+import { getRandomInteger, getRandomItem, getRandomArray, getDate } from '../utils/common.js';
 
 import { generateComments } from './comment.js';
 
