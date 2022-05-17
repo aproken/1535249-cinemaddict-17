@@ -10,6 +10,7 @@ import FilmsListShowMoreView from '../view/films-card/films-list-show-more-view.
 import FilmCardView from '../view/films-card/film-card-view.js';
 
 import FilmDetailsPresenter from './film-details-presenter.js';
+import { generateFilter } from '../mock/filter.js';
 
 import { FILM_COUNT_ON_SCREEN, FilterType } from '../const.js';
 
@@ -28,6 +29,7 @@ export default class FilmsPresenter {
 
   #films = [];
   #filter = null;
+  #filters = null;
   #renderedFilmCount = FILM_COUNT_ON_SCREEN;
 
   constructor(filmsContainer, filmsModel) {
@@ -39,6 +41,8 @@ export default class FilmsPresenter {
     this.#filter = FilterType.ALL;
 
     this.#filmDetailsPresenter = new FilmDetailsPresenter(this.#filmDetailsContainer);
+
+    this.#filters = generateFilter(filmsModel.films);
   }
 
   init = () => {
@@ -75,7 +79,7 @@ export default class FilmsPresenter {
   };
 
   #renderFilms = () => {
-    render(new FilterView(this.#films), this.#filmsContainer);
+    render(new FilterView(this.#filters), this.#filmsContainer);
     render(new SortView(this.#films), this.#filmsContainer);
 
     render(this.#filmsComponent, this.#filmsContainer);

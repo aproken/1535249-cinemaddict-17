@@ -1,5 +1,5 @@
 import { SAMPLE_DESCRIPTION, AUTHORS, EMOTIONS, COMMENTS_COUNT, YEAR_COMMENT } from '../const.js';
-import { getRandomInteger, getRandomItem, getDate } from '../utils.js';
+import { getRandomInteger, getRandomItem, getDate } from '../utils/common.js';
 
 // Функция для генерации одного комментария от случайного пользователя
 const generateCommentItem = () => ({
