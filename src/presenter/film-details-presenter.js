@@ -1,27 +1,106 @@
-import { RenderPosition, render, remove } from '../framework/render.js';
+import { render, RenderPosition, remove, replace } from '../framework/render.js';
 
 import FilmDetailsView from '../view/film-details/film-details-view.js';
 import FormFilmDetailsView from '../view/film-details/form-film-details-view.js';
 import FilmDescriptionView from '../view/film-details/film-description-view.js';
 import CommentsView from '../view/comments/comments-view.js';
-import CommentsItemView from '../view/comments/comments-item-view.js';
+import CommentItemView from '../view/comments/comment-item-view.js';
 import AddNewCommentView from '../view/comments/add-new-comment-view.js';
 
 export default class FilmDetailsPresenter {
   #filmDetailsContainer = null;
+  #changeData = null;
 
-  #filmDetailsComponent = new FilmDetailsView();
-  #formFilmDetailsComponent = new FormFilmDetailsView();
+  #filmDetailsComponent = null;
+  #formFilmDetailsComponent = null;
   #filmDescriptionComponent = null;
   #commentsContainerComponent = null;
   #commentsListComponent = null;
 
-  #film = null;
+  film = null;
   #comments = null;
 
-  constructor(filmDetailsContainer) {
+  constructor(filmDetailsContainer, changeData) {
     this.#filmDetailsContainer = filmDetailsContainer;
+    this.#changeData = changeData;
   }
+
+  show = (film) => {
+    this.film = film;
+    this.#comments = this.film.comments;
+
+    const prevFilmDetailsComponent = this.#filmDetailsComponent;
+
+    this.#filmDetailsComponent = new FilmDetailsView();
+    this.#formFilmDetailsComponent = new FormFilmDetailsView();
+    this.#filmDescriptionComponent = new FilmDescriptionView(this.film);
+    this.#commentsContainerComponent = new CommentsView(this.film);
+    this.#commentsListComponent = this.#commentsContainerComponent.element.querySelector('.film-details__comments-wrap');
+
+    if (prevFilmDetailsComponent === null) {
+      this.#renderPopup();
+      return;
+    }
+
+    if (this.#filmDetailsContainer.contains(prevFilmDetailsComponent.element)) {
+      this.#replacePopup(this.#filmDetailsComponent, prevFilmDetailsComponent);
+    }
+  };
+
+  hide = () => {
+    remove(this.#filmDetailsComponent);
+    remove(this.#formFilmDetailsComponent);
+    this.film = null;
+    document.body.classList.remove('hide-overflow');
+    this.#filmDescriptionComponent.unsetClickHandler();
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#filmDetailsComponent = null;
+  };
+
+  #renderFilmDescription = () => {
+    render(this.#filmDescriptionComponent, this.#formFilmDetailsComponent.element);
+
+    this.#filmDescriptionComponent.setClickHandler(this.hide);
+    this.#filmDescriptionComponent.setAddToWatchlistHandler(this.#handleAddToWatchlist);
+    this.#filmDescriptionComponent.setAlreadyWatchedHandler(this.#handleAlreadyWatched);
+    this.#filmDescriptionComponent.setAddToFavoritesHandler(this.#handleAddToFavorites);
+  };
+
+  #renderCommentItem = (comment) => {
+    render(new CommentItemView(comment), this.#commentsListComponent);
+  };
+
+  #renderCommentsList = () => {
+    render(this.#commentsContainerComponent, this.#formFilmDetailsComponent.element);
+
+    if (this.#comments.length) {
+      this.#comments.forEach((commetItem) => this.#renderCommentItem(commetItem));
+    }
+  };
+
+  #renderAddNewComment = () => {
+    render(new AddNewCommentView(), this.#commentsListComponent);
+  };
+
+  #renderFormFilmDetails = () => {
+    render(this.#formFilmDetailsComponent, this.#filmDetailsComponent.element);
+    this.#renderFilmDescription();
+    this.#renderCommentsList();
+    this.#renderAddNewComment();
+  };
+
+  #renderPopup = () => {
+    render(this.#filmDetailsComponent, this.#filmDetailsContainer, RenderPosition.AFTER_END);
+    this.#renderFormFilmDetails();
+
+    document.body.classList.add('hide-overflow');
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #replacePopup = (newComponent, oldComponent) => {
+    replace(newComponent, oldComponent);
+    this.#renderFormFilmDetails();
+  };
 
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
@@ -30,37 +109,18 @@ export default class FilmDetailsPresenter {
     }
   };
 
-  show = (film) => {
-    this.#film = film;
-    this.#comments = this.#film.comments;
-
-    this.#filmDescriptionComponent = new FilmDescriptionView(this.#film);
-    this.#commentsContainerComponent = new CommentsView(this.#film);
-    this.#commentsListComponent = this.#commentsContainerComponent.element.querySelector('.film-details__comments-wrap');
-
-    render(this.#filmDetailsComponent, this.#filmDetailsContainer, RenderPosition.AFTER_END);
-    render(this.#formFilmDetailsComponent, this.#filmDetailsComponent.element);
-    render(this.#filmDescriptionComponent, this.#formFilmDetailsComponent.element);
-    render(this.#commentsContainerComponent, this.#formFilmDetailsComponent.element);
-
-    for(let i = 0; i < this.#comments.length; i++) {
-      render(new CommentsItemView(this.#comments[i]), this.#commentsListComponent);
-    }
-
-    render(new AddNewCommentView(), this.#commentsListComponent);
-
-    document.body.classList.add('hide-overflow');
-
-    this.#filmDescriptionComponent.setClickHandler(this.hide);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+  #handleAddToWatchlist = () => {
+    this.film.userDetails['watchlist'] = !this.film.userDetails['watchlist'];
+    this.#changeData(this.film);
   };
 
-  hide = () => {
-    remove(this.#filmDetailsComponent);
-    remove(this.#formFilmDetailsComponent);
-    this.#film = null;
-    document.body.classList.remove('hide-overflow');
-    this.#filmDescriptionComponent.unsetClickHandler();
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  #handleAlreadyWatched = () => {
+    this.film.userDetails['alreadyWatched'] = !this.film.userDetails['alreadyWatched'];
+    this.#changeData(this.film);
+  };
+
+  #handleAddToFavorites = () => {
+    this.film.userDetails['favorite'] = !this.film.userDetails['favorite'];
+    this.#changeData(this.film);
   };
 }

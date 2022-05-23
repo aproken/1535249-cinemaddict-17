@@ -127,7 +127,7 @@ export const YEAR_COMMENT = [2021, 2022];
 
 export const RUNTIME = [90, 120];
 
-export const FILMS_COUNT = 23;
+export const FILMS_COUNT = 27;
 
 export const FILM_COUNT_ON_SCREEN = 5;
 
