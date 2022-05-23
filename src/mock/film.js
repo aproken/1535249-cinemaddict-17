@@ -1,3 +1,5 @@
+import {nanoid} from 'nanoid';
+
 import { TITLES, POSTERS, DIRECTORS, WRITERS, ACTORS, RELEASE_COUNTRIES, GENRES, SAMPLE_DESCRIPTION, WRITERS_COUNT, ACTORS_COUNT, GENRES_COUNT, DESCRIPTIONS_COUNT, YEAR_RELEASE, RUNTIME } from '../const.js';
 
 import { getRandomInteger, getRandomItem, getRandomArray, getDate } from '../utils/common.js';
@@ -5,7 +7,7 @@ import { getRandomInteger, getRandomItem, getRandomArray, getDate } from '../uti
 import { generateComments } from './comment.js';
 
 export const generateFilm = () => ({
-  id: getRandomInteger(0, 999),
+  id: nanoid(),
   comments: generateComments(),
   filmInfo: {
     title: getRandomItem(TITLES),

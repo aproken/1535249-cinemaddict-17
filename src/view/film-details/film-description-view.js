@@ -106,6 +106,27 @@ export default class FilmDescriptionView extends AbstractView {
     return createFilmDescriptionTemplate(this.#film);
   }
 
+  setAddToWatchlistHandler = (callback) => {
+    this._callback.watchlistClick = callback;
+    this.element
+      .querySelector('#watchlist')
+      .addEventListener('click', this.#addToWatchlistHandler);
+  };
+
+  setAlreadyWatchedHandler = (callback) => {
+    this._callback.alreadyWatchedClick = callback;
+    this.element
+      .querySelector('#watched')
+      .addEventListener('click', this.#alreadyWatchedHandler);
+  };
+
+  setAddToFavoritesHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+    this.element
+      .querySelector('#favorite')
+      .addEventListener('click', this.#addToFavoritesHandler);
+  };
+
   setClickHandler = (callback) => {
     this._callback.click = callback;
     this.#closeButton = this.element.querySelector('.film-details__close-btn');
@@ -119,5 +140,20 @@ export default class FilmDescriptionView extends AbstractView {
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
+  };
+
+  #addToWatchlistHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.watchlistClick();
+  };
+
+  #alreadyWatchedHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.alreadyWatchedClick();
+  };
+
+  #addToFavoritesHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.favoriteClick();
   };
 }

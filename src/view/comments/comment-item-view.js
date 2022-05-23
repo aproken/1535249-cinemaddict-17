@@ -2,8 +2,8 @@ import dayjs from 'dayjs';
 
 import AbstractView from '../../framework/view/abstract-view.js';
 
-const createCommentsItemTemplate = (comments) => {
-  const {author, commentText, date, emotion} = comments;
+const createCommentItemTemplate = (comment) => {
+  const {author, commentText, date, emotion} = comment;
   return (
     `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
@@ -22,14 +22,14 @@ const createCommentsItemTemplate = (comments) => {
 };
 
 export default class CommentsItemView extends AbstractView {
-  #comments = null;
+  #comment = null;
 
-  constructor(comments) {
+  constructor(comment) {
     super();
-    this.#comments = comments;
+    this.#comment = comment;
   }
 
   get template() {
-    return createCommentsItemTemplate(this.#comments);
+    return createCommentItemTemplate(this.#comment);
   }
 }
