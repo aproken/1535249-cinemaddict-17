@@ -4,7 +4,7 @@ import AbstractView from '../../framework/view/abstract-view.js';
 
 const createFilmDescriptionTemplate = (film) => {
   const {
-    filmInfo: {title, alternativeTitle, poster, director, writers, actors, description, genre, runtime, release: {date, releaseCountry}},
+    filmInfo: {title, totalRating, alternativeTitle, poster, director, writers, actors, description, genre, runtime, release: {date, releaseCountry}},
     userDetails: {watchlist, alreadyWatched, favorite}} = film;
   return (
     `<div class="film-details__top-container">
@@ -26,7 +26,7 @@ const createFilmDescriptionTemplate = (film) => {
             </div>
 
             <div class="film-details__rating">
-              <p class="film-details__total-rating">8.9</p>
+              <p class="film-details__total-rating">${totalRating}</p>
             </div>
           </div>
 
