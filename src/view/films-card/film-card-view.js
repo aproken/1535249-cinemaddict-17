@@ -6,7 +6,7 @@ import { MAX_LENGTH_DESCRIPTION } from '../../const.js';
 const createFilmCardTemplate = (film) => {
   const {
     comments,
-    filmInfo: {title, poster, description, genre, runtime, release: {date}},
+    filmInfo: {title, totalRating, poster, description, genre, runtime, release: {date}},
     userDetails: {watchlist, alreadyWatched, favorite},
   } = film;
 
@@ -14,7 +14,7 @@ const createFilmCardTemplate = (film) => {
     `<article class="film-card">
       <a class="film-card__link">
         <h3 class="film-card__title">${title}</h3>
-        <p class="film-card__rating">8.3</p>
+        <p class="film-card__rating">${totalRating}</p>
         <p class="film-card__info">
           <span class="film-card__year">${dayjs(date).format('YYYY')}</span>
           <span class="film-card__duration">1h ${runtime - 60}m</span>

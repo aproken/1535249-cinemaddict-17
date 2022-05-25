@@ -138,4 +138,10 @@ export const FilterType = {
   FAVORITES: 'Favorites',
 };
 
+export const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATING: 'rating',
+};
+
 

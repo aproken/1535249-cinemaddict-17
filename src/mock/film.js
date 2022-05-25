@@ -12,7 +12,7 @@ export const generateFilm = () => ({
   filmInfo: {
     title: getRandomItem(TITLES),
     alternativeTitle: getRandomItem(TITLES),
-    totalRating: 5.3,
+    totalRating: Math.floor(Math.random() * 100) /10,
     poster: getRandomItem(POSTERS),
     ageRating: 0,
     director: getRandomItem(DIRECTORS),
