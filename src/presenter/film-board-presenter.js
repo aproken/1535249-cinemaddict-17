@@ -1,4 +1,4 @@
-import { render, remove } from '../framework/render.js';
+import { RenderPosition, render, remove } from '../framework/render.js';
 
 import SortView from '../view/sort-view.js';
 import FilterView from '../view/filter-view.js';
@@ -103,13 +103,19 @@ export default class FilmBoardPresenter {
     }
 
     this.#sortFilms(sortType);
+    this.#clearSort();
     this.#clearFilmList();
+    this.#renderSort();
     this.#renderFilmList();
+  };
+
+  #clearSort = () => {
+    remove(this.#sortComponent);
   };
 
   #renderSort = () => {
     this.#sortComponent = new SortView(this.#films, this.#currentSortType);
-    render(this.#sortComponent, this.#filmsContainer);
+    render(this.#sortComponent, this.#filterComponent.element, RenderPosition.AFTEREND);
     this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   };
 
