@@ -15,6 +15,8 @@ import { generateFilter } from '../mock/filter.js';
 
 import { FILM_COUNT_ON_SCREEN, FilterType } from '../const.js';
 import { updateItem } from '../utils/common.js';
+import { sortFilmByDate, sortFilmByRating } from '../utils/sort.js';
+import { SortType } from '../const.js';
 
 export default class FilmBoardPresenter {
   #filmsContainer = null;
@@ -32,9 +34,11 @@ export default class FilmBoardPresenter {
   #films = [];
   #currentFilter = null;
   #filters = null;
+  #currentSortType = SortType.DEFAULT;
   #renderedFilmCount = FILM_COUNT_ON_SCREEN;
   #filmCardPresenter = new Map();
   #filmDetailsPresenter = null;
+  #sourcedFilms = [];
 
   constructor(filmsContainer, filmsModel) {
     this.#filmsContainer = filmsContainer;
@@ -42,6 +46,7 @@ export default class FilmBoardPresenter {
     this.#filmsModel = filmsModel;
 
     this.#films = [...this.#filmsModel.films];
+    this.#sourcedFilms = [...this.#filmsModel.films];
     this.#currentFilter = FilterType.ALL;
 
     this.#filters = generateFilter(filmsModel.films);
@@ -64,7 +69,9 @@ export default class FilmBoardPresenter {
 
   #handleFilmCardChange = (updatedFilmCard) => {
     this.#films = updateItem(this.#films, updatedFilmCard);
+    this.#sourcedFilms = updateItem(this.#sourcedFilms, updatedFilmCard);
     this.#filmCardPresenter.get(updatedFilmCard.id).init(updatedFilmCard);
+
     if (this.#filmDetailsPresenter.film){
       this.#filmDetailsPresenter.show(updatedFilmCard);
     }
@@ -75,9 +82,35 @@ export default class FilmBoardPresenter {
     render(this.#filterComponent, this.#filmsContainer);
   };
 
+  #sortFilms = (sortType) => {
+    switch (sortType) {
+      case SortType.DATE:
+        this.#films.sort(sortFilmByDate);
+        break;
+      case SortType.RATING:
+        this.#films.sort(sortFilmByRating);
+        break;
+      default:
+        this.#films = [...this.#sourcedFilms];
+    }
+
+    this.#currentSortType = sortType;
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortFilms(sortType);
+    this.#clearFilmList();
+    this.#renderFilmList();
+  };
+
   #renderSort = () => {
-    this.#sortComponent = new SortView(this.#films);
+    this.#sortComponent = new SortView(this.#films, this.#currentSortType);
     render(this.#sortComponent, this.#filmsContainer);
+    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   };
 
   #renderFilm = (film) => {
@@ -98,7 +131,7 @@ export default class FilmBoardPresenter {
     render(this.#filmslistEmptyComponent, this.#filmsComponent.element);
   };
 
-  #clearFilmsList = () => {
+  #clearFilmList = () => {
     this.#filmCardPresenter.forEach((presenter) => presenter.destroy());
     this.#filmCardPresenter.clear();
 
