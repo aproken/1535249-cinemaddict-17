@@ -16,6 +16,7 @@ export default class FilmDetailsPresenter {
   #filmDescriptionComponent = null;
   #commentsContainerComponent = null;
   #commentsListComponent = null;
+  #addNewCommentComponent = null;
 
   film = null;
   #comments = null;
@@ -36,6 +37,7 @@ export default class FilmDetailsPresenter {
     this.#filmDescriptionComponent = new FilmDescriptionView(this.film);
     this.#commentsContainerComponent = new CommentsView(this.film);
     this.#commentsListComponent = this.#commentsContainerComponent.element.querySelector('.film-details__comments-wrap');
+    this.#addNewCommentComponent = new AddNewCommentView(this.film);
 
     if (prevFilmDetailsComponent === null) {
       this.#renderPopup();
@@ -79,7 +81,7 @@ export default class FilmDetailsPresenter {
   };
 
   #renderAddNewComment = () => {
-    render(new AddNewCommentView(), this.#commentsListComponent);
+    render(this.#addNewCommentComponent, this.#commentsListComponent);
   };
 
   #renderFormFilmDetails = () => {
