@@ -8,7 +8,7 @@ const BLANK_COMMENT = {
   author: getRandomItem(AUTHORS),
   commentText: '',
   date: getDate(...YEAR_COMMENT),
-  emotion: undefined,
+  emotion: null,
 };
 
 const selectedEmotion = (emotion) =>
