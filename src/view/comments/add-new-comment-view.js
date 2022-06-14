@@ -1,3 +1,4 @@
+import he from 'he';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
 
 import { AUTHORS, YEAR_COMMENT } from '../../const.js';
@@ -146,6 +147,7 @@ export default class AddNewCommentView extends AbstractStatefulView {
     }
 
     const comment = AddNewCommentView.parseStateToComment(this._state);
+    comment.commentText = he.encode(comment.commentText);
     this.reset(BLANK_COMMENT);
     this._callback.addComment(comment);
   };

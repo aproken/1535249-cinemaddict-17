@@ -1,7 +1,6 @@
 import { RenderPosition, render, remove } from '../framework/render.js';
 
 import SortView from '../view/sort-view.js';
-//import FilterView from '../view/filter-view.js';
 import FilmsView from '../view/films-card/films-view.js';
 import FilmsListView from '../view/films-card/films-list-view.js';
 import FilmsListEmptyView from '../view/films-card/films-list-empty-view.js';
@@ -190,7 +189,7 @@ export default class FilmBoardPresenter {
   };
 
   #renderFilmsListEmpty = () => {
-    this.#filmslistEmptyComponent = new FilmsListEmptyView(this.#filterType);
+    this.#filmslistEmptyComponent = new FilmsListEmptyView(this.#filterModel.filter);
     render(this.#filmslistEmptyComponent, this.#filmsComponent.element);
   };
 
@@ -210,7 +209,8 @@ export default class FilmBoardPresenter {
     remove(this.#filmsListShowMoreComponent);
 
     if (this.#filmslistEmptyComponent) {
-      remove(this.#renderFilmsListEmpty);
+      // debugger
+      remove(this.#filmslistEmptyComponent);
     }
 
     if (resetRenderedFilmCount) {

@@ -1,17 +1,10 @@
 import AbstractView from '../../framework/view/abstract-view.js';
 
-import { FilterType } from '../../const.js';
-
-const titleType = {
-  [FilterType.ALL]: 'There are no movies in our database',
-  [FilterType.WATCHLIST]: 'There are no movies to watch now',
-  [FilterType.HISTORY]: 'There are no watched movies now',
-  [FilterType.FAVORITES]: 'There are no favorite movies now',
-};
+import { TitleType } from '../../const.js';
 
 const createFilmsListEmptyTemplate = (filterName) => (
   `<section class="films-list">
-    <h2 class="films-list__title">${titleType[filterName]}</h2>
+    <h2 class="films-list__title">${TitleType[filterName]}</h2>
    </section>`
 );
 
