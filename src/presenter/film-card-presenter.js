@@ -1,6 +1,8 @@
 import { render, replace, remove } from '../framework/render.js';
 
 import FilmCardView from '../view/films-card/film-card-view.js';
+import { UserAction, UpdateType } from '../const.js';
+
 
 export default class FilmCardPresenter {
   #filmListContainer = null;
@@ -52,18 +54,21 @@ export default class FilmCardPresenter {
     this.#filmDetailsPresenter.show(this.#film);
   };
 
-  #handleAddToWatchlist = () => {
-    this.#film.userDetails['watchlist'] = !this.#film.userDetails['watchlist'];
-    this.#changeData(this.#film);
-  };
+  #handleAddToWatchlist = () => this.#changeData(
+    UserAction.ADD_TO_WATCHLIST,
+    UpdateType.MINOR,
+    {filmId: this.#film.id}
+  );
 
-  #handleAlreadyWatched = () => {
-    this.#film.userDetails['alreadyWatched'] = !this.#film.userDetails['alreadyWatched'];
-    this.#changeData(this.#film);
-  };
+  #handleAlreadyWatched = () => this.#changeData(
+    UserAction.ADD_TO_ALREADY_WATCHED,
+    UpdateType.MINOR,
+    {filmId: this.#film.id}
+  );
 
-  #handleAddToFavorites = () => {
-    this.#film.userDetails['favorite'] = !this.#film.userDetails['favorite'];
-    this.#changeData(this.#film);
-  };
+  #handleAddToFavorites = () => this.#changeData(
+    UserAction.ADD_TO_FAVORITES,
+    UpdateType.MINOR,
+    {filmId: this.#film.id}
+  );
 }

@@ -138,10 +138,31 @@ export const FilterType = {
   FAVORITES: 'Favorites',
 };
 
+export const EmptyFilterText = {
+  [FilterType.ALL]: 'There are no movies in our database',
+  [FilterType.WATCHLIST]: 'There are no movies to watch now',
+  [FilterType.HISTORY]: 'There are no watched movies now',
+  [FilterType.FAVORITES]: 'There are no favorite movies now',
+};
+
 export const SortType = {
   DEFAULT: 'default',
   DATE: 'date',
   RATING: 'rating',
+};
+
+export const UserAction = {
+  ADD_TO_WATCHLIST: 'ADD_TO_WATCHLIST',
+  ADD_TO_ALREADY_WATCHED: 'ADD_TO_ALREADY_WATCHED',
+  ADD_TO_FAVORITES: 'ADD_TO_FAVORITES',
+  ADD_COMMENT: 'ADD_COMMENT',
+  DELETE_COMMENT: 'DELETE_COMMENT',
+};
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
 };
 
 
