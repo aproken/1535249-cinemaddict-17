@@ -138,7 +138,7 @@ export const FilterType = {
   FAVORITES: 'Favorites',
 };
 
-export const TitleType = {
+export const EmptyFilterText = {
   [FilterType.ALL]: 'There are no movies in our database',
   [FilterType.WATCHLIST]: 'There are no movies to watch now',
   [FilterType.HISTORY]: 'There are no watched movies now',
