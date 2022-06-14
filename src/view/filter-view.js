@@ -4,7 +4,7 @@ const createFilterItemTemplate = (filter) => {
   const {name, count} = filter;
 
   return (
-    `<a href="#watchlist" class="main-navigation__item">${name} <span class="main-navigation__item-count">${count}</span></a>`
+    `<a href="#watchlist" class="main-navigation__item" data-filter-type="${name}">${name} <span class="main-navigation__item-count">${count}</span></a>`
   );
 };
 
@@ -22,13 +22,25 @@ const createFilterTemplate = (filterItems) => {
 
 export default class FilterView extends AbstractView {
   #filters = null;
+  #currentFilter = null;
 
-  constructor(filters) {
+  constructor(filters, currentFilterType) {
     super();
     this.#filters = filters;
+    this.#currentFilter = currentFilterType;
   }
 
   get template() {
-    return createFilterTemplate(this.#filters);
+    return createFilterTemplate(this.#filters, this.#currentFilter);
   }
+
+  setFilterTypeChangeHandler = (callback) => {
+    this._callback.filterTypeChange = callback;
+    this.element.addEventListener('click', this.#filterTypeChangeHandler);
+  };
+
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.filterTypeChange(evt.target.dataset.filterType);
+  };
 }

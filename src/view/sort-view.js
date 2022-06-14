@@ -26,12 +26,10 @@ const createSortTemplate = (currentSortType) => (
 );
 
 export default class SortView extends AbstractView {
-  #films = null;
   #currentSortType = null;
 
-  constructor(films, currentSortType) {
+  constructor(currentSortType) {
     super();
-    this.#films = films;
     this.#currentSortType = currentSortType;
   }
 

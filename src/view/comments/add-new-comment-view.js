@@ -1,7 +1,7 @@
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
 
 import { AUTHORS, YEAR_COMMENT } from '../../const.js';
-import { getRandomItem, getDate, pressedKeyShortcut } from '../../utils/common.js';
+import { getRandomItem, getDate } from '../../utils/common.js';
 
 const BLANK_COMMENT = {
   id: null,
@@ -78,6 +78,18 @@ const createAddNewCommentTemplate = (comment) => {
   `);
 };
 
+const pressKeyHandler = (callback) => {
+  const listener = (evt) => {
+    if (evt.key === 'Enter' && (evt.metaKey || evt.ctrlKey)) {
+      callback();
+    }
+  };
+
+  document.addEventListener('keydown', listener);
+
+  return () => document.removeEventListener('keydown', listener);
+};
+
 export default class AddNewCommentView extends AbstractStatefulView {
   #removeListener = null;
 
@@ -111,9 +123,6 @@ export default class AddNewCommentView extends AbstractStatefulView {
   static parseStateToComment = (state) => {
     const comment = {...state};
 
-    // delete comment.emotion;
-    // delete comment.commentText;
-
     return comment;
   };
 
@@ -126,7 +135,7 @@ export default class AddNewCommentView extends AbstractStatefulView {
 
   #commentInputHandler = (evt) => {
     evt.preventDefault();
-    this.updateElement({
+    this._setState({
       commentText: evt.target.value,
     });
   };
@@ -148,13 +157,13 @@ export default class AddNewCommentView extends AbstractStatefulView {
 
     this.element
       .querySelector('.film-details__comment-input')
-      .addEventListener('change', this.#commentInputHandler);
+      .addEventListener('input', this.#commentInputHandler);
 
     if (this.#removeListener) {
       this.#removeListener();
     }
 
-    this.#removeListener = pressedKeyShortcut(this.#addLocalComment, 'MetaLeft', 'Enter');
+    this.#removeListener = pressKeyHandler(this.#addLocalComment);
   };
 
   setAddCommentHandler = (callback) => {
