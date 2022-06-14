@@ -92,10 +92,6 @@ export default class FilmDetailsPresenter {
     this.#filmDescriptionComponent.setAddToFavoritesHandler(addToFavorites);
   };
 
-  #renderCommentItem = (comment) => {
-
-  };
-
   #renderCommentsList = () => {
     render(this.#commentsContainerComponent, this.#formFilmDetailsComponent.element);
 
