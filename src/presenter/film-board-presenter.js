@@ -7,14 +7,15 @@ import FilmsListView from '../view/films-card/films-list-view.js';
 import FilmsListEmptyView from '../view/films-card/films-list-empty-view.js';
 import FilmsListContainerView from '../view/films-card/films-list-container-view.js';
 import FilmsListShowMoreView from '../view/films-card/films-list-show-more-view.js';
+import FilmsListTopRatedView from '../view/films-card/films-list-top-rated-view.js';
+import FilmsListMostCommentedView from '../view/films-card/films-list-most-commented-view.js';
 
 import FilmCardPresenter from './film-card-presenter.js';
 import FilmDetailsPresenter from './film-details-presenter.js';
 
 import { generateFilter } from '../mock/filter.js';
 
-import { FILM_COUNT_ON_SCREEN, FilterType } from '../const.js';
-import { updateItem } from '../utils/common.js';
+import { FILM_COUNT_ON_SCREEN, FilterType, UserAction, UpdateType } from '../const.js';
 import { sortFilmByDate, sortFilmByRating } from '../utils/sort.js';
 import { SortType } from '../const.js';
 
@@ -27,6 +28,8 @@ export default class FilmBoardPresenter {
   #sortComponent = null;
   #filmsComponent = new FilmsView();
   #filmsListComponent = new FilmsListView();
+  #filmsListTopRatedComponent = new FilmsListTopRatedView();
+  #filmsListMostCommentedComponent = new FilmsListMostCommentedView();
   #filmslistEmptyComponent = null;
   #filmsListContainerComponent = new FilmsListContainerView();
   #filmsListShowMoreComponent = new FilmsListShowMoreView();
@@ -51,7 +54,13 @@ export default class FilmBoardPresenter {
 
     this.#filters = generateFilter(filmsModel.films);
 
-    this.#filmDetailsPresenter = new FilmDetailsPresenter(this.#filmDetailsContainer, this.#handleFilmCardChange);
+    this.#filmDetailsPresenter = new FilmDetailsPresenter(this.#filmDetailsContainer, this.#handleViewAction);
+
+    this.#filmsModel.addObserver(this.#handleModelEvent);
+  }
+
+  get(films) {
+    return this.#filmsModel(films);
   }
 
   init = () => {
@@ -67,13 +76,82 @@ export default class FilmBoardPresenter {
     }
   };
 
-  #handleFilmCardChange = (updatedFilmCard) => {
-    this.#films = updateItem(this.#films, updatedFilmCard);
-    this.#sourcedFilms = updateItem(this.#sourcedFilms, updatedFilmCard);
-    this.#filmCardPresenter.get(updatedFilmCard.id).init(updatedFilmCard);
+  #handleAddToWatchlist = (filmId) => {
+    const film = this.#filmsModel.getFilmById(filmId);
+    film.userDetails['watchlist'] = !film.userDetails['watchlist'];
+    return film;
+  };
 
-    if (this.#filmDetailsPresenter.film){
-      this.#filmDetailsPresenter.show(updatedFilmCard);
+  #handleAlreadyWatched = (filmId) => {
+    const film = this.#filmsModel.getFilmById(filmId);
+    film.userDetails['alreadyWatched'] = !film.userDetails['alreadyWatched'];
+    return film;
+  };
+
+  #handleAddToFavorites = (filmId) => {
+    const film = this.#filmsModel.getFilmById(filmId);
+    film.userDetails['favorite'] = !film.userDetails['favorite'];
+    return film;
+  };
+
+  #handleViewAction = (actionType, updateType, payload) => {
+    switch (actionType) {
+      case UserAction.ADD_TO_WATCHLIST:
+        this.#filmsModel.updateFilm(
+          updateType,
+          this.#handleAddToWatchlist(payload.filmId)
+        );
+        break;
+      case UserAction.ADD_TO_ALREADY_WATCHED:
+        this.#filmsModel.updateFilm(
+          updateType,
+          this.#handleAlreadyWatched(payload.filmId)
+        );
+        break;
+      case UserAction.ADD_TO_FAVORITES:
+        this.#filmsModel.updateFilm(
+          updateType,
+          this.#handleAddToFavorites(payload.filmId)
+        );
+        break;
+      case UserAction.ADD_COMMENT:
+        this.#filmsModel.addComment(
+          updateType,
+          payload.filmId,
+          payload.currentComment
+        );
+        break;
+      case UserAction.DELETE_COMMENT:
+        this.#filmsModel.deleteComment(
+          updateType,
+          payload.filmId,
+          payload.commentId
+        );
+        break;
+    }
+  };
+
+  #handleModelEvent = (updateType, data) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#filmCardPresenter.get(data.id).init(data);
+
+        if (this.#filmDetailsPresenter.film){
+          this.#filmDetailsPresenter.show(data);
+        }
+        break;
+      case UpdateType.MINOR:
+        this.#clearFilmList();
+        this.#renderFilmList();
+
+        if (this.#filmDetailsPresenter.film){
+          this.#filmDetailsPresenter.show(data);
+        }
+        break;
+      case UpdateType.MAJOR:
+        this.#clearFilmList({resetRenderedFilmCount: true, resetSortType: true});
+        this.#renderFilmList();
+        break;
     }
   };
 
@@ -120,7 +198,7 @@ export default class FilmBoardPresenter {
   };
 
   #renderFilm = (film) => {
-    const currentFilmCardPresenter = new FilmCardPresenter(this.#filmsListContainerComponent.element, this.#filmDetailsPresenter, this.#handleFilmCardChange);
+    const currentFilmCardPresenter = new FilmCardPresenter(this.#filmsListContainerComponent.element, this.#filmDetailsPresenter, this.#handleViewAction);
     currentFilmCardPresenter.init(film);
     this.#filmCardPresenter.set(film.id, currentFilmCardPresenter);
 

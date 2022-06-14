@@ -57,3 +57,36 @@ export const updateItem = (items, update) => {
     ...items.slice(index + 1),
   ];
 };
+
+export const pressedKeyShortcut = (callback, ...codes) => {
+  const pressed = new Set();
+
+  const addToPressed = (evt) => {
+    pressed.add(evt.code);
+    console.log(pressed, evt);
+
+    for(const code of codes) {
+      if (!pressed.has(code)) {
+        return;
+      }
+    }
+
+    pressed.clear();
+
+    callback();
+  };
+
+  const deleteIntoPressed = (evt) => {
+    pressed.delete(evt.code);
+  };
+
+  const removeListener = () => {
+    document.removeEventListener('keydown', addToPressed);
+    document.removeEventListener('keyup', deleteIntoPressed);
+  };
+
+  document.addEventListener('keydown', addToPressed);
+  document.addEventListener('keyup', deleteIntoPressed);
+
+  return removeListener;
+};

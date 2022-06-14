@@ -1,7 +1,7 @@
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
 
 import { AUTHORS, YEAR_COMMENT } from '../../const.js';
-import { getRandomItem, getDate } from '../../utils/common.js';
+import { getRandomItem, getDate, pressedKeyShortcut } from '../../utils/common.js';
 
 const BLANK_COMMENT = {
   id: null,
@@ -79,6 +79,8 @@ const createAddNewCommentTemplate = (comment) => {
 };
 
 export default class AddNewCommentView extends AbstractStatefulView {
+  #removeListener = null;
+
   constructor(comment = BLANK_COMMENT) {
     super();
     this._state = AddNewCommentView.parseCommentToState(comment);
@@ -91,7 +93,7 @@ export default class AddNewCommentView extends AbstractStatefulView {
   }
 
   reset = (comment) => {
-    this.updateData(
+    this.updateElement(
       AddNewCommentView.parseCommentToState(comment),
     );
   };
@@ -109,8 +111,8 @@ export default class AddNewCommentView extends AbstractStatefulView {
   static parseStateToComment = (state) => {
     const comment = {...state};
 
-    delete comment.emotion;
-    delete comment.commentText;
+    // delete comment.emotion;
+    // delete comment.commentText;
 
     return comment;
   };
@@ -129,6 +131,16 @@ export default class AddNewCommentView extends AbstractStatefulView {
     });
   };
 
+  #addLocalComment = () => {
+    if (!this._state.commentText || !this._state.emotion) {
+      return;
+    }
+
+    const comment = AddNewCommentView.parseStateToComment(this._state);
+    this.reset(BLANK_COMMENT);
+    this._callback.addComment(comment);
+  };
+
   #setInnerHandlers = () => {
     this.element
       .querySelectorAll('.film-details__emoji-item')
@@ -137,5 +149,21 @@ export default class AddNewCommentView extends AbstractStatefulView {
     this.element
       .querySelector('.film-details__comment-input')
       .addEventListener('change', this.#commentInputHandler);
+
+    if (this.#removeListener) {
+      this.#removeListener();
+    }
+
+    this.#removeListener = pressedKeyShortcut(this.#addLocalComment, 'MetaLeft', 'Enter');
   };
+
+  setAddCommentHandler = (callback) => {
+    this._callback.addComment = callback;
+  };
+
+  removeElement() {
+    this.#removeListener();
+    this.#removeListener = null;
+    super.removeElement();
+  }
 }

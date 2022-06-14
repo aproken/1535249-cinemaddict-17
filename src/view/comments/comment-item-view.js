@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import AbstractView from '../../framework/view/abstract-view.js';
 
 const createCommentItemTemplate = (comment) => {
-  const {author, commentText, date, emotion} = comment;
+  const {id, author, commentText, date, emotion} = comment;
   return (
     `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
@@ -14,7 +14,7 @@ const createCommentItemTemplate = (comment) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
           <span class="film-details__comment-day">${dayjs(date).format('YYYY/MM/DD HH:mm')}</span>
-          <button class="film-details__comment-delete">Delete</button>
+          <button class="film-details__comment-delete" data-comment-id="${id}">Delete</button>
         </p>
       </div>
     </li>`
@@ -24,9 +24,20 @@ const createCommentItemTemplate = (comment) => {
 export default class CommentsItemView extends AbstractView {
   #comment = null;
 
-  constructor(comment) {
+  constructor(comment, handlers={}) {
     super();
     this.#comment = comment;
+
+    this
+      .element
+      .querySelector('button')
+      .addEventListener(
+        'click',
+        (evt) => {
+          evt.preventDefault();
+          handlers.deleteComment(this.#comment.id);
+        }
+      );
   }
 
   get template() {

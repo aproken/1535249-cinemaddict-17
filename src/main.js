@@ -11,6 +11,8 @@ const siteMainElement = document.querySelector('.main');
 const siteFooterElement = document.querySelector('.footer');
 
 const filmsModel = new FilmsModel();
+filmsModel.init();
+
 const filmBoardPresenter = new FilmBoardPresenter(siteMainElement, filmsModel);
 
 render(new ProfileRatingView(), siteHeaderElement);
