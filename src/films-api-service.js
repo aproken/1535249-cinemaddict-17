@@ -25,4 +25,16 @@ export default class FilmsApiService extends ApiService {
 
     return parsedResponse;
   };
+
+  refreshComments = async (filmId) => {
+    const response = await this._load({
+      url: `comments/${filmId}`,
+      method: Method.GET,
+      headers: new Headers({'Content-Type': 'application/json'}),
+    });
+
+    const parsedResponse = await ApiService.parseResponse(response);
+
+    return parsedResponse;
+  };
 }

@@ -95,6 +95,14 @@ export default class FilmsModel extends Observable {
     this._notify(updateType, film);
   };
 
+  refreshComments = async (filmId) => {
+    const film = this.#films.find((filmItem) => filmItem.id === filmId);
+    const comments = await this.#filmsApiService.refreshComments(filmId);
+    film.comments = comments.map(this.#adaptCommentsToClient);
+
+    this._notify(UpdateType.PATCH, film);
+  };
+
   #adaptToClient = (film) => {
     const adaptedFilm = {...film,
       filmInfo: {
@@ -125,5 +133,16 @@ export default class FilmsModel extends Observable {
     delete adaptedFilm.userDetails.watching_date;
 
     return adaptedFilm;
+  };
+
+  #adaptCommentsToClient = (comment) => {
+    const adaptedComment = {
+      ...comment,
+      commentText: comment.comment,
+    };
+
+    delete adaptedComment.comment;
+
+    return adaptedComment;
   };
 }

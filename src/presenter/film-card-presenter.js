@@ -13,21 +13,22 @@ export default class FilmCardPresenter {
 
   #filmDetailsPresenter = null;
 
+  #filmsModel = null;
   #film = null;
 
-  constructor(filmListContainer, filmDetailsPresenter, changeData) {
+  constructor(filmListContainer, filmDetailsPresenter, filmsModel, changeData) {
     this.#filmListContainer = filmListContainer;
     this.#filmDetailsPresenter = filmDetailsPresenter;
-
+    this.#filmsModel = filmsModel;
     this.#changeData = changeData;
   }
 
-  init = (film) => {
-    this.#film = film;
+  init = (filmId) => {
+    this.#film = this.#filmsModel.getFilmById(filmId);
 
     const prevFilmCardComponent = this.#filmCardComponent;
 
-    this.#filmCardComponent = new FilmCardView(film);
+    this.#filmCardComponent = new FilmCardView(this.#film);
 
     this.#filmCardComponent.setClickHandler(this.#showFilmDetails);
     this.#filmCardComponent.setAddToWatchlistHandler(this.#handleAddToWatchlist);
@@ -51,7 +52,10 @@ export default class FilmCardPresenter {
   };
 
   #showFilmDetails = () => {
-    this.#filmDetailsPresenter.show(this.#film);
+    // обновить комментарии для фильма
+    this.#filmsModel
+      .refreshComments(this.#film.id)
+      .then(() => this.#filmDetailsPresenter.show(this.#film));
   };
 
   #handleAddToWatchlist = () => this.#changeData(

@@ -142,7 +142,7 @@ export default class FilmBoardPresenter {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#filmCardPresenter.get(data.id).init(data);
+        this.#filmCardPresenter.get(data.id).init(data.id);
 
         if (this.#filmDetailsPresenter.film){
           this.#filmDetailsPresenter.show(data);
@@ -186,8 +186,8 @@ export default class FilmBoardPresenter {
   };
 
   #renderFilm = (film) => {
-    const currentFilmCardPresenter = new FilmCardPresenter(this.#filmsListContainerComponent.element, this.#filmDetailsPresenter, this.#handleViewAction);
-    currentFilmCardPresenter.init(film);
+    const currentFilmCardPresenter = new FilmCardPresenter(this.#filmsListContainerComponent.element, this.#filmDetailsPresenter, this.#filmsModel, this.#handleViewAction);
+    currentFilmCardPresenter.init(film.id);
     this.#filmCardPresenter.set(film.id, currentFilmCardPresenter);
 
   };
