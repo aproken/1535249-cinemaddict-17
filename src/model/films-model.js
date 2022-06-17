@@ -39,21 +39,23 @@ export default class FilmsModel extends Observable {
 
   //изменить отдельный фильм
   updateFilm = async (updateType, update) => {
-    const index = this.#films.findIndex((film) => film.id === update.id);
+    let film = this.getFilmById(update.id);
 
-    if (index === -1) {
+    // TODO: нужно ли обновлять список комментариев с сервера?
+    const comments = film.comments;
+
+    if (!film) {
       throw new Error('Can\'t update unexisting film');
     }
 
     try {
       const response = await this.#filmsApiService.updateFilm(update);
-      const updatedFilm = this.#adaptToClient(response);
-      this.#films = [
-        ...this.#films.slice(0, index),
-        updatedFilm,
-        ...this.#films.slice(index + 1),
-      ];
-      this._notify(updateType, updatedFilm);
+      film = {
+        ...this.#adaptToClient(response),
+        comments
+      };
+
+      this._notify(updateType, film);
     } catch(err) {
       throw new Error('Can\'t update film');
     }
@@ -126,7 +128,6 @@ export default class FilmsModel extends Observable {
     delete adaptedFilm.filmInfo.alternative_title;
     delete adaptedFilm.filmInfo.total_rating;
     delete adaptedFilm.filmInfo.age_rating;
-    delete adaptedFilm.filmInfo.release.date;
     delete adaptedFilm.filmInfo.release.release_country;
     delete adaptedFilm.user_details;
     delete adaptedFilm.userDetails.already_watched;
