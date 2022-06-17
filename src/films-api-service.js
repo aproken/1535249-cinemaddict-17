@@ -58,7 +58,7 @@ export default class FilmsApiService extends ApiService {
     };
 
     if (adaptedFilm.comments && adaptedFilm.comments[0] instanceof Object){
-      adaptedFilm.comments = adaptedFilm.comments.map((c) => c.id);
+      adaptedFilm.comments = adaptedFilm.comments.map((comment) => comment.id);
     }
 
     delete adaptedFilm.filmInfo;
