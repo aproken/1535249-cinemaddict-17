@@ -21,13 +21,11 @@ const filterModel = new FilterModel();
 
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
 const filmBoardPresenter = new FilmBoardPresenter(siteMainElement, filmsModel, filterModel);
+filmBoardPresenter.init();
 
 filmsModel.init()
   .finally(() => {
-    console.log('finally');
-
     filterPresenter.init();
-    filmBoardPresenter.init();
     render(new ProfileRatingView(filmsModel.films), siteHeaderElement);
     render(new FooterStatisticsView(filmsModel.films), siteFooterElement);
   });

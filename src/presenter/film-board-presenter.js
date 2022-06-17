@@ -68,7 +68,7 @@ export default class FilmBoardPresenter {
   }
 
   init = () => {
-    //this.#renderFilmBoard();
+    this.#renderFilmBoard();
   };
 
   #handleFilmsListShowMoreClick = () => {
