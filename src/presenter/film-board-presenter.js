@@ -4,6 +4,7 @@ import SortView from '../view/sort-view.js';
 import FilmsView from '../view/films-card/films-view.js';
 import FilmsListView from '../view/films-card/films-list-view.js';
 import FilmsListEmptyView from '../view/films-card/films-list-empty-view.js';
+import LoadingView from '../view/loading-view.js';
 import FilmsListContainerView from '../view/films-card/films-list-container-view.js';
 import FilmsListShowMoreView from '../view/films-card/films-list-show-more-view.js';
 import FilmsListTopRatedView from '../view/films-card/films-list-top-rated-view.js';
@@ -27,6 +28,7 @@ export default class FilmBoardPresenter {
   #filmsListComponent = new FilmsListView();
   #filmsListTopRatedComponent = new FilmsListTopRatedView();
   #filmsListMostCommentedComponent = new FilmsListMostCommentedView();
+  #loadingComponent = new LoadingView();
   #filmslistEmptyComponent = null;
   #filmsListContainerComponent = new FilmsListContainerView();
   #filmsListShowMoreComponent = new FilmsListShowMoreView();
@@ -36,6 +38,7 @@ export default class FilmBoardPresenter {
   #filmDetailsPresenter = null;
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
+  #isLoading = true;
 
   constructor(filmsContainer, filmsModel, filterModel) {
     this.#filmsContainer = filmsContainer;
@@ -65,7 +68,7 @@ export default class FilmBoardPresenter {
   }
 
   init = () => {
-    this.#renderFilmBoard();
+    //this.#renderFilmBoard();
   };
 
   #handleFilmsListShowMoreClick = () => {
@@ -157,6 +160,11 @@ export default class FilmBoardPresenter {
         this.#clearFilmBoard({resetRenderedFilmCount: true, resetSortType: true});
         this.#renderFilmBoard();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderFilmBoard();
+        break;
     }
   };
 
@@ -188,6 +196,10 @@ export default class FilmBoardPresenter {
     films.forEach((film) => this.#renderFilm(film));
   };
 
+  #renderLoading = () => {
+    render(this.#loadingComponent, this.#filmsComponent.element, RenderPosition.AFTERBEGIN);
+  };
+
   #renderFilmsListEmpty = () => {
     this.#filmslistEmptyComponent = new FilmsListEmptyView(this.#filterModel.filter);
     render(this.#filmslistEmptyComponent, this.#filmsComponent.element);
@@ -206,10 +218,10 @@ export default class FilmBoardPresenter {
     this.#filmCardPresenter.clear();
 
     remove(this.#sortComponent);
+    remove(this.#loadingComponent);
     remove(this.#filmsListShowMoreComponent);
 
     if (this.#filmslistEmptyComponent) {
-      // debugger
       remove(this.#filmslistEmptyComponent);
     }
 
@@ -226,10 +238,15 @@ export default class FilmBoardPresenter {
   };
 
   #renderFilmBoard = () => {
+    render(this.#filmsComponent, this.#filmsContainer);
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     const films = this.films;
     const filmCount = films.length;
-
-    render(this.#filmsComponent, this.#filmsContainer);
 
     if (!filmCount) {
       this.#renderFilmsListEmpty();

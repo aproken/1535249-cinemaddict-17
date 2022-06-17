@@ -1,20 +1,36 @@
 import {nanoid} from 'nanoid';
 
 import Observable from '../framework/observable.js';
-import { FILMS_COUNT, UpdateType } from '../const.js';
-import { generateFilm } from '../mock/film.js';
+import { UpdateType } from '../const.js';
 
 export default class FilmsModel extends Observable {
+  #filmsApiService = null;
   #films = [];
 
-  init = () => {
-    this.#films = Array.from({length: FILMS_COUNT}, generateFilm);
-  };
+  constructor(filmsApiService) {
+    super();
+    this.#filmsApiService = filmsApiService;
+  }
 
   //получить фильмы
   get films() {
     return this.#films;
+    console.log(this.#films);
   }
+
+  init = async () => {
+    console.log('1');
+    try {
+      console.log('2');
+      const films = await this.#filmsApiService.films;
+      this.#films = films.map(this.#adaptToClient);
+    } catch(err) {
+      console.log('3');
+      this.#films = [];
+    }
+
+    this._notify(UpdateType.INIT);
+  };
 
   //Записать фильмы
   set films(value) {
@@ -26,18 +42,25 @@ export default class FilmsModel extends Observable {
   getFilmById = (filmId) => this.#films.find((filmItem) => filmItem.id === filmId);
 
   //изменить отдельный фильм
-  updateFilm = (updateType, update) => {
+  updateFilm = async (updateType, update) => {
     const index = this.#films.findIndex((film) => film.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t update unexisting film');
     }
 
-    this.#films = [
-      ...this.#films.slice(0, index),
-      update,
-      ...this.#films.slice(index + 1),
-    ];
+    try {
+      const response = await this.#filmsApiService.updateFilm(update);
+      const updatedFilm = this.#adaptToClient(response);
+      this.#films = [
+        ...this.#films.slice(0, index),
+        updatedFilm,
+        ...this.#films.slice(index + 1),
+      ];
+      this._notify(updateType, updatedFilm);
+    } catch(err) {
+      throw new Error('Can\'t update film');
+    }
 
     this._notify(updateType, update);
   };
@@ -62,17 +85,49 @@ export default class FilmsModel extends Observable {
 
   deleteComment = (updateType, filmId, commentId) => {
     const film = this.#films.find((filmItem) => filmItem.id === filmId);
-    const commentIdx = film.comments.findIndex((comment) => comment.id === commentId);
+    const commentIndex = film.comments.findIndex((comment) => comment.id === commentId);
 
     if (film === undefined) {
       throw new Error('Can\'t delete unexisting film');
     }
 
     film.comments = [
-      ...film.comments.slice(0, commentIdx),
-      ...film.comments.slice(commentIdx + 1),
+      ...film.comments.slice(0, commentIndex),
+      ...film.comments.slice(commentIndex + 1),
     ];
 
     this._notify(updateType, film);
+  };
+
+  #adaptToClient = (film) => {
+    const adaptedFilm = {...film,
+      filmInfo: {
+        ...film.film_info,
+        alternativeTitle: film.film_info.alternative_title,
+        totalRating: film.film_info.total_rating,
+        ageRating: film.film_info.age_rating,
+        release: {
+          date: film.film_info.release.date,
+          releaseCountry: film.film_info.release.release_country,
+        },
+      },
+      userDetails: {
+        ...film.user_details,
+        alreadyWatched: film.user_details.already_watched,
+        watchingDate: film.user_details.watching_date,
+      }
+    };
+
+    delete adaptedFilm.film_info;
+    delete adaptedFilm.filmInfo.alternative_title;
+    delete adaptedFilm.filmInfo.total_rating;
+    delete adaptedFilm.filmInfo.age_rating;
+    delete adaptedFilm.filmInfo.release.date;
+    delete adaptedFilm.filmInfo.release.release_country;
+    delete adaptedFilm.user_details;
+    delete adaptedFilm.userDetails.already_watched;
+    delete adaptedFilm.userDetails.watching_date;
+
+    return adaptedFilm;
   };
 }
