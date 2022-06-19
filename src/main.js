@@ -8,9 +8,7 @@ import FilterPresenter from './presenter/filter-presenter.js';
 import FilmsModel from './model/films-model.js';
 import FilterModel from './model/filter-model.js';
 import FilmsApiService from './films-api-service.js';
-
-const AUTHORIZATION  = 'Basic gERki88430555NaU';
-const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict';
+import { AUTHORIZATION, END_POINT } from './config.js';
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
