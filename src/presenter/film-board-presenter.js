@@ -46,7 +46,7 @@ export default class FilmBoardPresenter {
     this.#filmsModel = filmsModel;
     this.#filterModel = filterModel;
 
-    this.#filmDetailsPresenter = new FilmDetailsPresenter(this.#filmDetailsContainer, this.#handleViewAction);
+    this.#filmDetailsPresenter = new FilmDetailsPresenter(this.#filmDetailsContainer, this.#filmsModel, this.#handleViewAction);
 
     this.#filterModel.addObserver(this.#handleModelEvent);
     this.#filmsModel.addObserver(this.#handleModelEvent);

@@ -52,10 +52,7 @@ export default class FilmCardPresenter {
   };
 
   #showFilmDetails = () => {
-    // обновить комментарии для фильма
-    this.#filmsModel
-      .refreshComments(this.#film.id)
-      .then(() => this.#filmDetailsPresenter.show(this.#film));
+    this.#filmDetailsPresenter.show(this.#film, {refreshComments: true});
   };
 
   #handleAddToWatchlist = () => this.#changeData(

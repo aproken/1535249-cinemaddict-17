@@ -103,10 +103,12 @@ export default class FilmsModel extends Observable {
     film.comments = comments.map(this.#adaptCommentsToClient);
 
     this._notify(UpdateType.PATCH, film);
+    return film.comments;
   };
 
   #adaptToClient = (film) => {
     const adaptedFilm = {...film,
+      comments: [],
       filmInfo: {
         ...film.film_info,
         alternativeTitle: film.film_info.alternative_title,

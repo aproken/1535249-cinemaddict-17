@@ -6,6 +6,7 @@ import FilmDescriptionView from '../view/film-details/film-description-view.js';
 import CommentsView from '../view/comments/comments-view.js';
 import CommentItemView from '../view/comments/comment-item-view.js';
 import AddNewCommentView from '../view/comments/add-new-comment-view.js';
+import LoadingView from '../view/loading-view.js';
 import { UserAction, UpdateType } from '../const.js';
 
 
@@ -20,23 +21,35 @@ export default class FilmDetailsPresenter {
   #commentsListComponent = null;
   #addNewCommentComponent = null;
 
+  #filmsModel = null;
   film = null;
-  #comments = null;
+  #loading = false;
 
-  constructor(filmDetailsContainer, changeData) {
+  constructor(filmDetailsContainer, filmsModel, changeData) {
     this.#filmDetailsContainer = filmDetailsContainer;
     this.#changeData = changeData;
+    this.#filmsModel = filmsModel;
   }
 
-  show = (film) => {
+  show = (film, {refreshComments = false} = {}) => {
+    if (refreshComments){
+      // обновить комментарии для фильма
+      this.#loading = true;
+      this.#filmsModel
+        .refreshComments(film.id)
+        .then( () => {
+          this.#loading = false;
+          this.#renderPopup();
+        });
+    }
     this.film = film;
-    this.#comments = this.film.comments;
 
     const prevFilmDetailsComponent = this.#filmDetailsComponent;
 
     this.#filmDetailsComponent = new FilmDetailsView();
     this.#formFilmDetailsComponent = new FormFilmDetailsView();
     this.#filmDescriptionComponent = new FilmDescriptionView(this.film);
+
     this.#commentsContainerComponent = new CommentsView(this.film);
     this.#commentsListComponent = this.#commentsContainerComponent.element.querySelector('.film-details__comments-wrap');
 
@@ -59,6 +72,7 @@ export default class FilmDetailsPresenter {
     remove(this.#filmDetailsComponent);
     remove(this.#formFilmDetailsComponent);
     this.film = null;
+    this.loading = false;
     document.body.classList.remove('hide-overflow');
     this.#filmDescriptionComponent.unsetClickHandler();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
@@ -101,8 +115,8 @@ export default class FilmDetailsPresenter {
       {filmId: this.film.id, commentId: commentId}
     );
 
-    if (this.#comments.length) {
-      this.#comments.forEach(
+    if (this.film.comments.length) {
+      this.film.comments.forEach(
         (comment) => render(new CommentItemView(comment, {deleteComment}), this.#commentsListComponent)
       );
     }
@@ -123,8 +137,13 @@ export default class FilmDetailsPresenter {
   #renderFormFilmDetails = () => {
     render(this.#formFilmDetailsComponent, this.#filmDetailsComponent.element);
     this.#renderFilmDescription();
-    this.#renderCommentsList();
-    this.#renderAddNewComment();
+
+    if (this.#loading) {
+      this.#renderLoaderComments();
+    } else {
+      this.#renderCommentsList();
+      this.#renderAddNewComment();
+    }
   };
 
   #renderPopup = () => {
@@ -138,6 +157,10 @@ export default class FilmDetailsPresenter {
   #replacePopup = (newComponent, oldComponent) => {
     replace(newComponent, oldComponent);
     this.#renderFormFilmDetails();
+  };
+
+  #renderLoaderComments = () => {
+    render(new LoadingView(), this.#formFilmDetailsComponent.element);
   };
 
   #escKeyDownHandler = (evt) => {
