@@ -1,6 +1,8 @@
 import he from 'he';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
+dayjs.extend(relativeTime);
 
 const BLANK_COMMENT = {
   id: null,
@@ -103,7 +105,7 @@ const createCommentItemTemplate = (comment) => {
         <p class="film-details__comment-text">${commentText}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
-          <span class="film-details__comment-day">${dayjs(date).format('YYYY/MM/DD HH:mm')}</span>
+          <span class="film-details__comment-day">${dayjs(date).fromNow()}</span>
           <button class="film-details__comment-delete" data-comment-id="${id}">
             ${isDeleting ? 'deleting...' : 'delete'}
           </button>
