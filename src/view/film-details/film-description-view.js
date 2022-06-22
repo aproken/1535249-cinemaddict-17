@@ -10,7 +10,7 @@ const SHAKE_ANIMATION_TIMEOUT = 600;
 
 const createFilmDescriptionTemplate = (film) => {
   const {
-    filmInfo: {title, totalRating, alternativeTitle, poster, director, writers, actors, description, genre, runtime, release: {date, releaseCountry}},
+    filmInfo: {title, totalRating, alternativeTitle, poster, ageRating, director, writers, actors, description, genre, runtime, release: {date, releaseCountry}},
     userDetails: {watchlist, alreadyWatched, favorite}} = film;
   return (
     `<div class="film-details__top-container">
@@ -21,7 +21,7 @@ const createFilmDescriptionTemplate = (film) => {
         <div class="film-details__poster">
           <img class="film-details__poster-img" src="${poster}" alt="">
 
-          <p class="film-details__age">18+</p>
+          <p class="film-details__age">${ageRating}+</p>
         </div>
 
         <div class="film-details__info">
