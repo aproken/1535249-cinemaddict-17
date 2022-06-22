@@ -12,6 +12,8 @@ const createFilmDescriptionTemplate = (film) => {
   const {
     filmInfo: {title, totalRating, alternativeTitle, poster, ageRating, director, writers, actors, description, genre, runtime, release: {date, releaseCountry}},
     userDetails: {watchlist, alreadyWatched, favorite}} = film;
+  const runtimeHours = Math.floor(runtime/60);
+  const runtimeMinutes = runtime % 60;
   return (
     `<div class="film-details__top-container">
       <div class="film-details__close">
@@ -55,7 +57,7 @@ const createFilmDescriptionTemplate = (film) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">1h ${runtime - 60}m</td>
+              <td class="film-details__cell">${runtimeHours}h ${runtimeMinutes}m</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
