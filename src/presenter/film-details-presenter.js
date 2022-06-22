@@ -24,6 +24,7 @@ export default class FilmDetailsPresenter {
   film = null;
   #loading = false;
   #loader = null;
+  #scrollTop = 0;
 
   constructor(filmDetailsContainer, filmsModel, changeData) {
     this.#filmDetailsContainer = filmDetailsContainer;
@@ -59,6 +60,9 @@ export default class FilmDetailsPresenter {
     if (this.#filmDetailsContainer.contains(prevFilmDetailsComponent.element)) {
       this.#replacePopup(this.#filmDetailsComponent, prevFilmDetailsComponent);
     }
+
+    this.#filmDetailsComponent.element.scrollTop = this.#scrollTop;
+
   };
 
   hide = () => {
@@ -70,28 +74,38 @@ export default class FilmDetailsPresenter {
     this.#filmDescriptionComponent.unsetClickHandler();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#filmDetailsComponent = null;
+    this.#scrollTop = 0;
   };
 
   #renderFilmDescription = () => {
     render(this.#filmDescriptionComponent, this.#formFilmDetailsComponent.element);
 
-    const addToWatchlist = () => this.#changeData(
-      UserAction.ADD_TO_WATCHLIST,
-      UpdateType.MINOR,
-      {filmId: this.film.id}
-    );
+    const addToWatchlist = () => {
+      this.#changeData(
+        UserAction.ADD_TO_WATCHLIST,
+        UpdateType.MINOR,
+        {filmId: this.film.id}
+      );
+      this.#scrollTop = this.#filmDetailsComponent.element.scrollTop;
+    };
 
-    const addToAlreadyWatched = () => this.#changeData(
-      UserAction.ADD_TO_ALREADY_WATCHED,
-      UpdateType.MINOR,
-      {filmId: this.film.id}
-    );
+    const addToAlreadyWatched = () => {
+      this.#changeData(
+        UserAction.ADD_TO_ALREADY_WATCHED,
+        UpdateType.MINOR,
+        {filmId: this.film.id}
+      );
+      this.#scrollTop = this.#filmDetailsComponent.element.scrollTop;
+    };
 
-    const addToFavorites = () => this.#changeData(
-      UserAction.ADD_TO_FAVORITES,
-      UpdateType.MINOR,
-      {filmId: this.film.id}
-    );
+    const addToFavorites = () => {
+      this.#changeData(
+        UserAction.ADD_TO_FAVORITES,
+        UpdateType.MINOR,
+        {filmId: this.film.id}
+      );
+      this.#scrollTop = this.#filmDetailsComponent.element.scrollTop;
+    };
 
     this.#filmDescriptionComponent.setClickHandler(this.hide);
     this.#filmDescriptionComponent.setAddToWatchlistHandler(addToWatchlist);
@@ -103,17 +117,23 @@ export default class FilmDetailsPresenter {
     this.#commentsContainerComponent = new CommentsView(this.film);
     render(this.#commentsContainerComponent, this.#formFilmDetailsComponent.element);
 
-    const deleteComment = (commentId) => this.#changeData(
-      UserAction.DELETE_COMMENT,
-      UpdateType.PATCH,
-      {filmId: this.film.id, commentId: commentId}
-    );
+    const deleteComment = (commentId) => {
+      this.#changeData(
+        UserAction.DELETE_COMMENT,
+        UpdateType.PATCH,
+        {filmId: this.film.id, commentId: commentId}
+      );
+      this.#scrollTop = this.#filmDetailsComponent.element.scrollTop;
+    };
 
-    const addComment = (localComment) => this.#changeData(
-      UserAction.ADD_COMMENT,
-      UpdateType.PATCH,
-      {filmId: this.film.id, currentComment: localComment}
-    );
+    const addComment = (localComment) => {
+      this.#changeData(
+        UserAction.ADD_COMMENT,
+        UpdateType.PATCH,
+        {filmId: this.film.id, currentComment: localComment}
+      );
+      this.#scrollTop = this.#filmDetailsComponent.element.scrollTop;
+    };
 
     this.#commentsContainerComponent.setDelCommentHandler(deleteComment);
     this.#commentsContainerComponent.setAddCommentHandler(addComment);
