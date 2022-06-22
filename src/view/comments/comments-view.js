@@ -7,7 +7,7 @@ const BLANK_COMMENT = {
   author: null,
   commentText: '',
   date: null,
-  emotion: null,
+  emotion: 'smile',
 };
 
 /** @const {string} Класс, реализующий эффект "покачивания головой" */
