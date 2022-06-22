@@ -4,8 +4,6 @@ import FilmDetailsView from '../view/film-details/film-details-view.js';
 import FormFilmDetailsView from '../view/film-details/form-film-details-view.js';
 import FilmDescriptionView from '../view/film-details/film-description-view.js';
 import CommentsView from '../view/comments/comments-view.js';
-// import CommentItemView from '../view/comments/comment-item-view.js';
-// import AddNewCommentView from '../view/comments/comments-view.js';
 import LoadingView from '../view/loading-view.js';
 import { UserAction, UpdateType } from '../const.js';
 
@@ -17,8 +15,6 @@ export default class FilmDetailsPresenter {
   #formFilmDetailsComponent = null;
   #filmDescriptionComponent = null;
   #commentsContainerComponent = null;
-  #commentsListComponent = null;
-  #addNewCommentComponent = null;
 
   #filmsModel = null;
   film = null;
@@ -34,7 +30,6 @@ export default class FilmDetailsPresenter {
 
   show = (film, {refreshComments = false} = {}) => {
     if (refreshComments){
-      // обновить комментарии для фильма
       this.#loading = true;
       this.#filmsModel
         .refreshComments(film.id)

@@ -1,6 +1,7 @@
 import { RenderPosition, render, remove } from '../framework/render.js';
 import UiBlocker  from '../framework/ui-blocker/ui-blocker.js';
 
+import ProfileRatingView from '../view/profile-rating-view.js';
 import SortView from '../view/sort-view.js';
 import FilmsView from '../view/films-card/films-view.js';
 import FilmsListView from '../view/films-card/films-list-view.js';
@@ -16,6 +17,7 @@ import FilmDetailsPresenter from './film-details-presenter.js';
 import { FILM_COUNT_ON_SCREEN, FilterType, SortType, UserAction, UpdateType } from '../const.js';
 import {filter} from '../utils/filter.js';
 import { sortFilmByDate, sortFilmByRating, sortFilmMostCommented } from '../utils/sort.js';
+import { getProfileRatingTitle } from '../utils/profile.js';
 
 const EXTRA_CARDS_COUNT = 2;
 
@@ -25,6 +27,7 @@ const TimeLimit = {
 };
 
 export default class FilmBoardPresenter {
+  #profileRatingViewContainer = null;
   #filmsContainer = null;
   #filmDetailsContainer = null;
   #filmsModel = null;
@@ -33,12 +36,11 @@ export default class FilmBoardPresenter {
   #sortComponent = null;
   #filmsComponent = new FilmsView();
   #filmsListComponent = new FilmsListView();
-  #filmsListTopRatedComponent = null;
-  #filmsListMostCommentedComponent = null;
   #loadingComponent = new LoadingView();
   #filmslistEmptyComponent = null;
   #filmsListContainerComponent = new FilmsListContainerView();
   #filmsListShowMoreComponent = new FilmsListShowMoreView();
+  #profileRatingViewComponent = null;
 
   #renderedFilmCount = FILM_COUNT_ON_SCREEN;
   #filmCardPresenter = new Map();
@@ -56,6 +58,7 @@ export default class FilmBoardPresenter {
 
   constructor(filmsContainer, filmsModel, filterModel) {
     this.#filmsContainer = filmsContainer;
+    this.#profileRatingViewContainer = document.querySelector('.header');
     this.#filmDetailsContainer = document.querySelector('.footer');
     this.#filmsModel = filmsModel;
     this.#filterModel = filterModel;
@@ -226,6 +229,7 @@ export default class FilmBoardPresenter {
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
+        this.#clearFilmBoard();
         this.#renderFilmBoard();
         break;
     }
@@ -283,6 +287,7 @@ export default class FilmBoardPresenter {
     remove(this.#sortComponent);
     remove(this.#loadingComponent);
     remove(this.#filmsListShowMoreComponent);
+    remove(this.#profileRatingViewComponent);
     remove(this.#mostCommentedExtraComponent);
     remove(this.#topRatedExtraComponent);
 
@@ -313,6 +318,15 @@ export default class FilmBoardPresenter {
   };
 
   #renderFilmBoard = () => {
+    const profileRatingTitle = getProfileRatingTitle(
+      this.#filmsModel
+        .films
+        .filter((film) => film.userDetails.alreadyWatched)
+        .length
+    );
+    this.#profileRatingViewComponent = new ProfileRatingView(profileRatingTitle);
+    render(this.#profileRatingViewComponent, this.#profileRatingViewContainer);
+
     render(this.#filmsComponent, this.#filmsContainer);
 
     if (this.#isLoading) {
