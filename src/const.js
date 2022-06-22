@@ -166,4 +166,12 @@ export const UpdateType = {
   INIT: 'INIT',
 };
 
+export const EXTRA_CARDS_COUNT = 2;
+
+/** @const {string} Класс, реализующий эффект "покачивания головой" */
+export const SHAKE_CLASS_NAME = 'shake';
+
+/** @const {number} Время анимации в миллисекундах */
+export const SHAKE_ANIMATION_TIMEOUT = 600;
+
 

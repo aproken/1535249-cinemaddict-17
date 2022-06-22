@@ -1,6 +1,7 @@
 import { RenderPosition, render, remove } from '../framework/render.js';
 import UiBlocker  from '../framework/ui-blocker/ui-blocker.js';
 
+import { TimeLimit } from '../config.js';
 import ProfileRatingView from '../view/profile-rating-view.js';
 import SortView from '../view/sort-view.js';
 import FilmsView from '../view/films-card/films-view.js';
@@ -14,17 +15,10 @@ import FilmsListExtraView from '../view/films-card/films-list-extra-view.js';
 import FilmCardPresenter from './film-card-presenter.js';
 import FilmDetailsPresenter from './film-details-presenter.js';
 
-import { FILM_COUNT_ON_SCREEN, FilterType, SortType, UserAction, UpdateType } from '../const.js';
+import { FILM_COUNT_ON_SCREEN, FilterType, SortType, UserAction, UpdateType, EXTRA_CARDS_COUNT} from '../const.js';
 import {filter} from '../utils/filter.js';
 import { sortFilmByDate, sortFilmByRating, sortFilmMostCommented } from '../utils/sort.js';
 import { getProfileRatingTitle } from '../utils/profile.js';
-
-const EXTRA_CARDS_COUNT = 2;
-
-const TimeLimit = {
-  LOWER_LIMIT: 350,
-  UPPER_LIMIT: 1000,
-};
 
 export default class FilmBoardPresenter {
   #profileRatingViewContainer = null;

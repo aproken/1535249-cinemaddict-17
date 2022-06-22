@@ -1,12 +1,7 @@
 import dayjs from 'dayjs';
 
 import AbstractView from '../../framework/view/abstract-view.js';
-
-/** @const {string} Класс, реализующий эффект "покачивания головой" */
-const SHAKE_CLASS_NAME = 'shake';
-
-/** @const {number} Время анимации в миллисекундах */
-const SHAKE_ANIMATION_TIMEOUT = 600;
+import { SHAKE_CLASS_NAME, SHAKE_ANIMATION_TIMEOUT } from '../../const.js';
 
 const createFilmDescriptionTemplate = (film) => {
   const {

@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
 dayjs.extend(relativeTime);
+import { SHAKE_CLASS_NAME, SHAKE_ANIMATION_TIMEOUT } from '../../const.js';
 
 const BLANK_COMMENT = {
   id: null,
@@ -11,12 +12,6 @@ const BLANK_COMMENT = {
   date: null,
   emotion: 'smile',
 };
-
-/** @const {string} Класс, реализующий эффект "покачивания головой" */
-const SHAKE_CLASS_NAME = 'shake';
-
-/** @const {number} Время анимации в миллисекундах */
-const SHAKE_ANIMATION_TIMEOUT = 600;
 
 const selectedEmotion = (emotion) =>
   emotion ?
