@@ -2,6 +2,12 @@ import dayjs from 'dayjs';
 
 import AbstractView from '../../framework/view/abstract-view.js';
 
+/** @const {string} Класс, реализующий эффект "покачивания головой" */
+const SHAKE_CLASS_NAME = 'shake';
+
+/** @const {number} Время анимации в миллисекундах */
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 const createFilmDescriptionTemplate = (film) => {
   const {
     filmInfo: {title, totalRating, alternativeTitle, poster, director, writers, actors, description, genre, runtime, release: {date, releaseCountry}},
@@ -155,5 +161,15 @@ export default class FilmDescriptionView extends AbstractView {
   #addToFavoritesHandler = (evt) => {
     evt.preventDefault();
     this._callback.favoriteClick();
+  };
+
+  shakeControls = () => {
+    const controlsElement = this.element.querySelector('.film-details__controls');
+    controlsElement
+      .classList
+      .add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      controlsElement.classList.remove(SHAKE_CLASS_NAME);
+    }, SHAKE_ANIMATION_TIMEOUT);
   };
 }

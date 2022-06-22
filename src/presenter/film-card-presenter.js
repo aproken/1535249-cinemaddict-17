@@ -27,7 +27,6 @@ export default class FilmCardPresenter {
     this.#film = this.#filmsModel.getFilmById(filmId);
 
     const prevFilmCardComponent = this.#filmCardComponent;
-
     this.#filmCardComponent = new FilmCardView(this.#film);
 
     this.#filmCardComponent.setClickHandler(this.#showFilmDetails);
@@ -72,4 +71,8 @@ export default class FilmCardPresenter {
     UpdateType.MINOR,
     {filmId: this.#film.id}
   );
+
+  setAborting = () => {
+    this.#filmCardComponent.shake();
+  };
 }

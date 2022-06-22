@@ -4,11 +4,10 @@ import FilmDetailsView from '../view/film-details/film-details-view.js';
 import FormFilmDetailsView from '../view/film-details/form-film-details-view.js';
 import FilmDescriptionView from '../view/film-details/film-description-view.js';
 import CommentsView from '../view/comments/comments-view.js';
-import CommentItemView from '../view/comments/comment-item-view.js';
-import AddNewCommentView from '../view/comments/add-new-comment-view.js';
+// import CommentItemView from '../view/comments/comment-item-view.js';
+// import AddNewCommentView from '../view/comments/comments-view.js';
 import LoadingView from '../view/loading-view.js';
 import { UserAction, UpdateType } from '../const.js';
-
 
 export default class FilmDetailsPresenter {
   #filmDetailsContainer = null;
@@ -24,6 +23,7 @@ export default class FilmDetailsPresenter {
   #filmsModel = null;
   film = null;
   #loading = false;
+  #loader = null;
 
   constructor(filmDetailsContainer, filmsModel, changeData) {
     this.#filmDetailsContainer = filmDetailsContainer;
@@ -39,6 +39,7 @@ export default class FilmDetailsPresenter {
         .refreshComments(film.id)
         .then( () => {
           this.#loading = false;
+          this.#removeLoaderComments();
           this.#renderPopup();
         });
     }
@@ -49,14 +50,6 @@ export default class FilmDetailsPresenter {
     this.#filmDetailsComponent = new FilmDetailsView();
     this.#formFilmDetailsComponent = new FormFilmDetailsView();
     this.#filmDescriptionComponent = new FilmDescriptionView(this.film);
-
-    this.#commentsContainerComponent = new CommentsView(this.film);
-    this.#commentsListComponent = this.#commentsContainerComponent.element.querySelector('.film-details__comments-wrap');
-
-    if (this.#addNewCommentComponent) {
-      this.#addNewCommentComponent.removeElement();
-    }
-    this.#addNewCommentComponent = new AddNewCommentView();
 
     if (prevFilmDetailsComponent === null) {
       this.#renderPopup();
@@ -107,6 +100,7 @@ export default class FilmDetailsPresenter {
   };
 
   #renderCommentsList = () => {
+    this.#commentsContainerComponent = new CommentsView(this.film);
     render(this.#commentsContainerComponent, this.#formFilmDetailsComponent.element);
 
     const deleteComment = (commentId) => this.#changeData(
@@ -115,23 +109,15 @@ export default class FilmDetailsPresenter {
       {filmId: this.film.id, commentId: commentId}
     );
 
-    if (this.film.comments.length) {
-      this.film.comments.forEach(
-        (comment) => render(new CommentItemView(comment, {deleteComment}), this.#commentsListComponent)
-      );
-    }
-  };
-
-  #renderAddNewComment = () => {
-    render(this.#addNewCommentComponent, this.#commentsListComponent);
-
     const addComment = (localComment) => this.#changeData(
       UserAction.ADD_COMMENT,
       UpdateType.PATCH,
       {filmId: this.film.id, currentComment: localComment}
     );
 
-    this.#addNewCommentComponent.setAddCommentHandler(addComment);
+    this.#commentsContainerComponent.setDelCommentHandler(deleteComment);
+    this.#commentsContainerComponent.setAddCommentHandler(addComment);
+
   };
 
   #renderFormFilmDetails = () => {
@@ -142,7 +128,6 @@ export default class FilmDetailsPresenter {
       this.#renderLoaderComments();
     } else {
       this.#renderCommentsList();
-      this.#renderAddNewComment();
     }
   };
 
@@ -160,7 +145,13 @@ export default class FilmDetailsPresenter {
   };
 
   #renderLoaderComments = () => {
-    render(new LoadingView(), this.#formFilmDetailsComponent.element);
+    this.#loader = new LoadingView();
+    render(this.#loader, this.#formFilmDetailsComponent.element);
+  };
+
+  #removeLoaderComments = () => {
+    remove(this.#loader);
+    this.#loader = null;
   };
 
   #escKeyDownHandler = (evt) => {
@@ -168,5 +159,45 @@ export default class FilmDetailsPresenter {
       evt.preventDefault();
       this.hide();
     }
+  };
+
+  setSaving = () => {
+    if (!this.film) {
+      return;
+    }
+    this.#commentsContainerComponent.updateElement({
+      isDisabled: true,
+    });
+  };
+
+  setDeleting = (commentId) => {
+    if (!this.film) {
+      return;
+    }
+    this.#commentsContainerComponent.updateElement({
+      isDisabled: true,
+      deletedComment: commentId,
+    });
+  };
+
+  setAddCommentAborting = () => {
+    if (!this.film) {
+      return;
+    }
+    this.#commentsContainerComponent.shakeAddComment();
+  };
+
+  setDelCommentAborting = (commentId) => {
+    if (!this.film) {
+      return;
+    }
+    this.#commentsContainerComponent.shakeDelComment(commentId);
+  };
+
+  setControlsAborting = () => {
+    if (!this.film) {
+      return;
+    }
+    this.#filmDescriptionComponent.shakeControls();
   };
 }

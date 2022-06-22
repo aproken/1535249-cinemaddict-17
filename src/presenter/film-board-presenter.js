@@ -1,4 +1,5 @@
 import { RenderPosition, render, remove } from '../framework/render.js';
+import UiBlocker  from '../framework/ui-blocker/ui-blocker.js';
 
 import SortView from '../view/sort-view.js';
 import FilmsView from '../view/films-card/films-view.js';
@@ -16,6 +17,11 @@ import FilmDetailsPresenter from './film-details-presenter.js';
 import { FILM_COUNT_ON_SCREEN, FilterType, SortType, UserAction, UpdateType } from '../const.js';
 import {filter} from '../utils/filter.js';
 import { sortFilmByDate, sortFilmByRating } from '../utils/sort.js';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class FilmBoardPresenter {
   #filmsContainer = null;
@@ -39,6 +45,7 @@ export default class FilmBoardPresenter {
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.ALL;
   #isLoading = true;
+  #uiBlocker=null;
 
   constructor(filmsContainer, filmsModel, filterModel) {
     this.#filmsContainer = filmsContainer;
@@ -47,6 +54,7 @@ export default class FilmBoardPresenter {
     this.#filterModel = filterModel;
 
     this.#filmDetailsPresenter = new FilmDetailsPresenter(this.#filmDetailsContainer, this.#filmsModel, this.#handleViewAction);
+    this.#uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
     this.#filterModel.addObserver(this.#handleModelEvent);
     this.#filmsModel.addObserver(this.#handleModelEvent);
@@ -102,41 +110,71 @@ export default class FilmBoardPresenter {
     return film;
   };
 
-  #handleViewAction = (actionType, updateType, payload) => {
+  #handleViewAction = async (actionType, updateType, payload) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.ADD_TO_WATCHLIST:
-        this.#filmsModel.updateFilm(
-          updateType,
-          this.#handleAddToWatchlist(payload.filmId)
-        );
+        this.#filmDetailsPresenter.setSaving();
+        try {
+          await this.#filmsModel.updateFilm(
+            updateType,
+            this.#handleAddToWatchlist(payload.filmId)
+          );
+        } catch (err) {
+          this.#filmDetailsPresenter.setControlsAborting();
+          this.#filmCardPresenter.get(payload.filmId).setAborting();
+        }
         break;
       case UserAction.ADD_TO_ALREADY_WATCHED:
-        this.#filmsModel.updateFilm(
-          updateType,
-          this.#handleAlreadyWatched(payload.filmId)
-        );
+        this.#filmDetailsPresenter.setSaving();
+        try {
+          await this.#filmsModel.updateFilm(
+            updateType,
+            this.#handleAlreadyWatched(payload.filmId)
+          );
+        } catch (err) {
+          this.#filmDetailsPresenter.setControlsAborting();
+          this.#filmCardPresenter.get(payload.filmId).setAborting();
+        }
         break;
       case UserAction.ADD_TO_FAVORITES:
-        this.#filmsModel.updateFilm(
-          updateType,
-          this.#handleAddToFavorites(payload.filmId)
-        );
+        this.#filmDetailsPresenter.setSaving();
+        try {
+          await this.#filmsModel.updateFilm(
+            updateType,
+            this.#handleAddToFavorites(payload.filmId)
+          );
+        } catch (err) {
+          this.#filmDetailsPresenter.setControlsAborting();
+          this.#filmCardPresenter.get(payload.filmId).setAborting();
+        }
         break;
       case UserAction.ADD_COMMENT:
-        this.#filmsModel.addComment(
-          updateType,
-          payload.filmId,
-          payload.currentComment
-        );
+        this.#filmDetailsPresenter.setSaving();
+        try {
+          await this.#filmsModel.addComment(
+            updateType,
+            payload.filmId,
+            payload.currentComment
+          );
+        } catch (err) {
+          this.#filmDetailsPresenter.setAddCommentAborting();
+        }
         break;
       case UserAction.DELETE_COMMENT:
-        this.#filmsModel.deleteComment(
-          updateType,
-          payload.filmId,
-          payload.commentId
-        );
+        this.#filmDetailsPresenter.setDeleting(payload.commentId);
+        try {
+          await this.#filmsModel.deleteComment(
+            updateType,
+            payload.filmId,
+            payload.commentId
+          );
+        } catch(err) {
+          this.#filmDetailsPresenter.setDelCommentAborting(payload.commentId);
+        }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
