@@ -1,11 +1,14 @@
 import dayjs from 'dayjs';
 
 import AbstractView from '../../framework/view/abstract-view.js';
+import { SHAKE_CLASS_NAME, SHAKE_ANIMATION_TIMEOUT } from '../../const.js';
 
 const createFilmDescriptionTemplate = (film) => {
   const {
-    filmInfo: {title, totalRating, alternativeTitle, poster, director, writers, actors, description, genre, runtime, release: {date, releaseCountry}},
+    filmInfo: {title, totalRating, alternativeTitle, poster, ageRating, director, writers, actors, description, genre, runtime, release: {date, releaseCountry}},
     userDetails: {watchlist, alreadyWatched, favorite}} = film;
+  const runtimeHours = Math.floor(runtime/60);
+  const runtimeMinutes = runtime % 60;
   return (
     `<div class="film-details__top-container">
       <div class="film-details__close">
@@ -15,7 +18,7 @@ const createFilmDescriptionTemplate = (film) => {
         <div class="film-details__poster">
           <img class="film-details__poster-img" src="${poster}" alt="">
 
-          <p class="film-details__age">18+</p>
+          <p class="film-details__age">${ageRating}+</p>
         </div>
 
         <div class="film-details__info">
@@ -37,11 +40,11 @@ const createFilmDescriptionTemplate = (film) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Writers</td>
-              <td class="film-details__cell">${writers}</td>
+              <td class="film-details__cell">${writers.join(', ')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Actors</td>
-              <td class="film-details__cell">${actors}</td>
+              <td class="film-details__cell">${actors.join(', ')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
@@ -49,7 +52,7 @@ const createFilmDescriptionTemplate = (film) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">1h ${runtime - 60}m</td>
+              <td class="film-details__cell">${runtimeHours}h ${runtimeMinutes}m</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
@@ -58,7 +61,7 @@ const createFilmDescriptionTemplate = (film) => {
             <tr class="film-details__row">
               <td class="film-details__term">Genres</td>
               <td class="film-details__cell">
-                <span class="film-details__genre">${genre}</span>
+                <span class="film-details__genre">${genre.join(', ')}</span>
             </tr>
           </table>
 
@@ -155,5 +158,15 @@ export default class FilmDescriptionView extends AbstractView {
   #addToFavoritesHandler = (evt) => {
     evt.preventDefault();
     this._callback.favoriteClick();
+  };
+
+  shakeControls = () => {
+    const controlsElement = this.element.querySelector('.film-details__controls');
+    controlsElement
+      .classList
+      .add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      controlsElement.classList.remove(SHAKE_CLASS_NAME);
+    }, SHAKE_ANIMATION_TIMEOUT);
   };
 }

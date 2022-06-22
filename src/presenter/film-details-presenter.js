@@ -4,11 +4,8 @@ import FilmDetailsView from '../view/film-details/film-details-view.js';
 import FormFilmDetailsView from '../view/film-details/form-film-details-view.js';
 import FilmDescriptionView from '../view/film-details/film-description-view.js';
 import CommentsView from '../view/comments/comments-view.js';
-import CommentItemView from '../view/comments/comment-item-view.js';
-import AddNewCommentView from '../view/comments/add-new-comment-view.js';
 import LoadingView from '../view/loading-view.js';
 import { UserAction, UpdateType } from '../const.js';
-
 
 export default class FilmDetailsPresenter {
   #filmDetailsContainer = null;
@@ -18,12 +15,12 @@ export default class FilmDetailsPresenter {
   #formFilmDetailsComponent = null;
   #filmDescriptionComponent = null;
   #commentsContainerComponent = null;
-  #commentsListComponent = null;
-  #addNewCommentComponent = null;
 
   #filmsModel = null;
   film = null;
   #loading = false;
+  #loader = null;
+  #scrollTop = 0;
 
   constructor(filmDetailsContainer, filmsModel, changeData) {
     this.#filmDetailsContainer = filmDetailsContainer;
@@ -33,12 +30,12 @@ export default class FilmDetailsPresenter {
 
   show = (film, {refreshComments = false} = {}) => {
     if (refreshComments){
-      // обновить комментарии для фильма
       this.#loading = true;
       this.#filmsModel
         .refreshComments(film.id)
         .then( () => {
           this.#loading = false;
+          this.#removeLoaderComments();
           this.#renderPopup();
         });
     }
@@ -50,14 +47,6 @@ export default class FilmDetailsPresenter {
     this.#formFilmDetailsComponent = new FormFilmDetailsView();
     this.#filmDescriptionComponent = new FilmDescriptionView(this.film);
 
-    this.#commentsContainerComponent = new CommentsView(this.film);
-    this.#commentsListComponent = this.#commentsContainerComponent.element.querySelector('.film-details__comments-wrap');
-
-    if (this.#addNewCommentComponent) {
-      this.#addNewCommentComponent.removeElement();
-    }
-    this.#addNewCommentComponent = new AddNewCommentView();
-
     if (prevFilmDetailsComponent === null) {
       this.#renderPopup();
       return;
@@ -66,6 +55,9 @@ export default class FilmDetailsPresenter {
     if (this.#filmDetailsContainer.contains(prevFilmDetailsComponent.element)) {
       this.#replacePopup(this.#filmDetailsComponent, prevFilmDetailsComponent);
     }
+
+    this.#filmDetailsComponent.element.scrollTop = this.#scrollTop;
+
   };
 
   hide = () => {
@@ -77,28 +69,38 @@ export default class FilmDetailsPresenter {
     this.#filmDescriptionComponent.unsetClickHandler();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#filmDetailsComponent = null;
+    this.#scrollTop = 0;
   };
 
   #renderFilmDescription = () => {
     render(this.#filmDescriptionComponent, this.#formFilmDetailsComponent.element);
 
-    const addToWatchlist = () => this.#changeData(
-      UserAction.ADD_TO_WATCHLIST,
-      UpdateType.MINOR,
-      {filmId: this.film.id}
-    );
+    const addToWatchlist = () => {
+      this.#changeData(
+        UserAction.ADD_TO_WATCHLIST,
+        UpdateType.MINOR,
+        {filmId: this.film.id}
+      );
+      this.#scrollTop = this.#filmDetailsComponent.element.scrollTop;
+    };
 
-    const addToAlreadyWatched = () => this.#changeData(
-      UserAction.ADD_TO_ALREADY_WATCHED,
-      UpdateType.MINOR,
-      {filmId: this.film.id}
-    );
+    const addToAlreadyWatched = () => {
+      this.#changeData(
+        UserAction.ADD_TO_ALREADY_WATCHED,
+        UpdateType.MINOR,
+        {filmId: this.film.id}
+      );
+      this.#scrollTop = this.#filmDetailsComponent.element.scrollTop;
+    };
 
-    const addToFavorites = () => this.#changeData(
-      UserAction.ADD_TO_FAVORITES,
-      UpdateType.MINOR,
-      {filmId: this.film.id}
-    );
+    const addToFavorites = () => {
+      this.#changeData(
+        UserAction.ADD_TO_FAVORITES,
+        UpdateType.MINOR,
+        {filmId: this.film.id}
+      );
+      this.#scrollTop = this.#filmDetailsComponent.element.scrollTop;
+    };
 
     this.#filmDescriptionComponent.setClickHandler(this.hide);
     this.#filmDescriptionComponent.setAddToWatchlistHandler(addToWatchlist);
@@ -107,31 +109,30 @@ export default class FilmDetailsPresenter {
   };
 
   #renderCommentsList = () => {
+    this.#commentsContainerComponent = new CommentsView(this.film);
     render(this.#commentsContainerComponent, this.#formFilmDetailsComponent.element);
 
-    const deleteComment = (commentId) => this.#changeData(
-      UserAction.DELETE_COMMENT,
-      UpdateType.PATCH,
-      {filmId: this.film.id, commentId: commentId}
-    );
-
-    if (this.film.comments.length) {
-      this.film.comments.forEach(
-        (comment) => render(new CommentItemView(comment, {deleteComment}), this.#commentsListComponent)
+    const deleteComment = (commentId) => {
+      this.#changeData(
+        UserAction.DELETE_COMMENT,
+        UpdateType.PATCH,
+        {filmId: this.film.id, commentId: commentId}
       );
-    }
-  };
+      this.#scrollTop = this.#filmDetailsComponent.element.scrollTop;
+    };
 
-  #renderAddNewComment = () => {
-    render(this.#addNewCommentComponent, this.#commentsListComponent);
+    const addComment = (localComment) => {
+      this.#changeData(
+        UserAction.ADD_COMMENT,
+        UpdateType.PATCH,
+        {filmId: this.film.id, currentComment: localComment}
+      );
+      this.#scrollTop = this.#filmDetailsComponent.element.scrollTop;
+    };
 
-    const addComment = (localComment) => this.#changeData(
-      UserAction.ADD_COMMENT,
-      UpdateType.PATCH,
-      {filmId: this.film.id, currentComment: localComment}
-    );
+    this.#commentsContainerComponent.setDelCommentHandler(deleteComment);
+    this.#commentsContainerComponent.setAddCommentHandler(addComment);
 
-    this.#addNewCommentComponent.setAddCommentHandler(addComment);
   };
 
   #renderFormFilmDetails = () => {
@@ -142,7 +143,6 @@ export default class FilmDetailsPresenter {
       this.#renderLoaderComments();
     } else {
       this.#renderCommentsList();
-      this.#renderAddNewComment();
     }
   };
 
@@ -160,7 +160,13 @@ export default class FilmDetailsPresenter {
   };
 
   #renderLoaderComments = () => {
-    render(new LoadingView(), this.#formFilmDetailsComponent.element);
+    this.#loader = new LoadingView();
+    render(this.#loader, this.#formFilmDetailsComponent.element);
+  };
+
+  #removeLoaderComments = () => {
+    remove(this.#loader);
+    this.#loader = null;
   };
 
   #escKeyDownHandler = (evt) => {
@@ -168,5 +174,45 @@ export default class FilmDetailsPresenter {
       evt.preventDefault();
       this.hide();
     }
+  };
+
+  setSaving = () => {
+    if (!this.film) {
+      return;
+    }
+    this.#commentsContainerComponent.updateElement({
+      isDisabled: true,
+    });
+  };
+
+  setDeleting = (commentId) => {
+    if (!this.film) {
+      return;
+    }
+    this.#commentsContainerComponent.updateElement({
+      isDisabled: true,
+      deletedComment: commentId,
+    });
+  };
+
+  setAddCommentAborting = () => {
+    if (!this.film) {
+      return;
+    }
+    this.#commentsContainerComponent.shakeAddComment();
+  };
+
+  setDelCommentAborting = (commentId) => {
+    if (!this.film) {
+      return;
+    }
+    this.#commentsContainerComponent.shakeDelComment(commentId);
+  };
+
+  setControlsAborting = () => {
+    if (!this.film) {
+      return;
+    }
+    this.#filmDescriptionComponent.shakeControls();
   };
 }

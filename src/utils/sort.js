@@ -8,3 +8,5 @@ export const sortFilmByDate = (filmA, filmB) => {
 };
 
 export const sortFilmByRating = (filmA, filmB) => filmA.filmInfo.totalRating - filmB.filmInfo.totalRating;
+
+export const sortFilmMostCommented = (filmA, filmB) => filmB.comments.length - filmA.comments.length;

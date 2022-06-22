@@ -1,5 +1,3 @@
-import {nanoid} from 'nanoid';
-
 import Observable from '../framework/observable.js';
 import { UpdateType } from '../const.js';
 
@@ -40,8 +38,6 @@ export default class FilmsModel extends Observable {
   //изменить отдельный фильм
   updateFilm = async (updateType, update) => {
     let film = this.getFilmById(update.id);
-
-    // TODO: нужно ли обновлять список комментариев с сервера?
     const comments = film.comments;
 
     if (!film) {
@@ -50,9 +46,11 @@ export default class FilmsModel extends Observable {
 
     try {
       const response = await this.#filmsApiService.updateFilm(update);
+      const updatedFilm = this.#adaptToClient(response);
+
       film = {
-        ...this.#adaptToClient(response),
-        comments
+        ...updatedFilm,
+        comments,
       };
 
       this._notify(updateType, film);
@@ -63,25 +61,33 @@ export default class FilmsModel extends Observable {
     this._notify(updateType, update);
   };
 
-  addComment = (updateType, filmId, currentComment) => {
-    const film = this.#films.find((filmItem) => filmItem.id === filmId);
+  addComment = async (updateType, filmId, comment) => {
+    const filmIndex = this.#films.findIndex((filmItem) => filmItem.id === filmId);
 
-    if (film === undefined) {
+    if (filmIndex === -1) {
       throw new Error('Can\'t delete unexisting film');
     }
 
-    // Подстановка ID (Пока нет сервера)
-    currentComment.id = nanoid();
+    try {
+      const response = await this.#filmsApiService.addLocalComment(filmId, comment);
+      const newComments = response.comments.map((commentItem) => this.#adaptCommentsToClient(commentItem));
+      const newFilm = this.#adaptToClient(response.movie);
+      newFilm.comments = newComments;
 
-    film.comments = [
-      ...film.comments,
-      currentComment,
-    ];
+      this.#films = [
+        ...this.#films.slice(0, filmIndex),
+        newFilm,
+        ...this.#films.slice(filmIndex + 1),
 
-    this._notify(updateType, film);
+      ];
+
+      this._notify(updateType, newFilm);
+    } catch(err) {
+      throw new Error('Can\'t add comment');
+    }
   };
 
-  deleteComment = (updateType, filmId, commentId) => {
+  deleteComment = async (updateType, filmId, commentId) => {
     const film = this.#films.find((filmItem) => filmItem.id === filmId);
     const commentIndex = film.comments.findIndex((comment) => comment.id === commentId);
 
@@ -89,12 +95,18 @@ export default class FilmsModel extends Observable {
       throw new Error('Can\'t delete unexisting film');
     }
 
-    film.comments = [
-      ...film.comments.slice(0, commentIndex),
-      ...film.comments.slice(commentIndex + 1),
-    ];
+    try {
+      await this.#filmsApiService.deleteComment(commentId);
 
-    this._notify(updateType, film);
+      film.comments = [
+        ...film.comments.slice(0, commentIndex),
+        ...film.comments.slice(commentIndex + 1),
+      ];
+
+      this._notify(updateType, film);
+    } catch(err) {
+      throw new Error('Can\'t delete comment');
+    }
   };
 
   refreshComments = async (filmId) => {
@@ -108,7 +120,6 @@ export default class FilmsModel extends Observable {
 
   #adaptToClient = (film) => {
     const adaptedFilm = {...film,
-      comments: [],
       filmInfo: {
         ...film.film_info,
         alternativeTitle: film.film_info.alternative_title,

@@ -1,4 +1,4 @@
-import ApiService from './framework/api-service.js';
+import ApiService from '../framework/api-service.js';
 
 const Method = {
   GET: 'GET',
@@ -38,6 +38,28 @@ export default class FilmsApiService extends ApiService {
     return parsedResponse;
   };
 
+  addLocalComment = async (filmId, localComment) => {
+    const response = await this._load({
+      url: `comments/${filmId}`,
+      method: Method.POST,
+      body: JSON.stringify(this.#adaptCommentToServer(localComment)),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    });
+
+    const parsedResponse = await ApiService.parseResponse(response);
+
+    return parsedResponse;
+  };
+
+  deleteComment = async (commentId) => {
+    const response = await this._load({
+      url: `comments/${commentId}`,
+      method: Method.DELETE,
+    });
+
+    return response;
+  };
+
   #adaptToServer = (film) => {
     const adaptedFilm = {...film,
       'film_info': {
@@ -70,5 +92,16 @@ export default class FilmsApiService extends ApiService {
     delete adaptedFilm.user_details.watchingDate;
 
     return adaptedFilm;
+  };
+
+  #adaptCommentToServer = (comment) => {
+    const adaptedComment = {
+      ...comment,
+      comment: comment.commentText,
+    };
+
+    delete comment.commentText;
+
+    return adaptedComment;
   };
 }
